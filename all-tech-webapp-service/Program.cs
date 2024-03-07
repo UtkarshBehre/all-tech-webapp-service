@@ -1,5 +1,6 @@
-
 using all_tech_webapp_service.Services;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
+using ConfigurationManager = System.Configuration.ConfigurationManager;
 
 namespace all_tech_webapp_service
 {
@@ -15,7 +16,10 @@ namespace all_tech_webapp_service
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddApplicationInsightsTelemetry();
+
+            var asConnectionString = ConfigurationManager.AppSettings["APPLICATIONINSIGHTS_CONNECTION_STRING"] ?? string.Empty;
+
+            builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions { ConnectionString = asConnectionString, });
 
             AddServices(builder);
             var app = builder.Build();
