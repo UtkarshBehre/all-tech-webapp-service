@@ -1,3 +1,5 @@
+using all_tech_webapp_service.Services;
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Mvc;
 
 namespace all_tech_webapp_service.Controllers
@@ -6,30 +8,31 @@ namespace all_tech_webapp_service.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
+        private readonly IWeatherForecastService _weatherForecastService;
+        private readonly TelemetryClient _telemetryClient;
 
-        private readonly ILogger<WeatherForecastController> _logger;
-
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(IWeatherForecastService weatherForecastService, TelemetryClient telemetryClient)
         {
-            _logger = logger;
+            _weatherForecastService = weatherForecastService ?? throw new ArgumentNullException(nameof(weatherForecastService));
+            _telemetryClient = telemetryClient;
         }
 
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
-            _logger.LogInformation($"{nameof(WeatherForecastController)}.{nameof(Get)}");
-
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            _telemetryClient.TrackTrace($"{nameof(WeatherForecastController)}.{nameof(Get)}");
+            var weatherForecasts = new WeatherForecast[] { };
+            
+            try
             {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+                weatherForecasts = _weatherForecastService.getWeatherForecasts();
+            }
+            catch (Exception ex)
+            {
+                _telemetryClient.TrackException(ex);
+            }
+
+            return weatherForecasts;
         }
     }
 }

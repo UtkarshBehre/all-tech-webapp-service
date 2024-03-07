@@ -1,4 +1,6 @@
 
+using all_tech_webapp_service.Services;
+
 namespace all_tech_webapp_service
 {
     public class Program
@@ -13,7 +15,9 @@ namespace all_tech_webapp_service
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddApplicationInsightsTelemetry();
 
+            AddServices(builder);
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -31,6 +35,11 @@ namespace all_tech_webapp_service
             app.MapControllers();
 
             app.Run();
+        }
+
+        public static void AddServices(WebApplicationBuilder builder)
+        {
+            builder.Services.AddSingleton<IWeatherForecastService, WeatherForecastService>();
         }
     }
 }
