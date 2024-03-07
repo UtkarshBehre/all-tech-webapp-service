@@ -1,0 +1,6 @@
+@all_tech_webapp_service_HostAddress = http://localhost:5253
+
+GET {{all_tech_webapp_service_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
