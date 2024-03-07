@@ -40,7 +40,7 @@ namespace all_tech_webapp_service.Controllers
         [Route("getForbidden")]
         public IActionResult getForbidden()
         {
-            return StatusCode((int) HttpStatusCode.Forbidden, "403 Tis forbidden");
+            return StatusCode((int) HttpStatusCode.Forbidden);
         }
 
         [HttpGet]
