@@ -27,7 +27,8 @@ namespace all_tech_webapp_service
             builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions { ConnectionString = asConnectionString });
 
             // SETUP COSMOS DB
-            var cosmosDbConfig = new CosmosDbConfig(builder.Configuration);
+
+            var cosmosDbConfig = builder.Environment.IsDevelopment() ? new CosmosDbConfig(builder.Configuration) : new CosmosDbConfig(ConfigurationManager.AppSettings);
             var cosmosDbConnector = new CosmosDbConnector(cosmosDbConfig);
 
             builder.Services.AddSingleton<ICosmosDbConnector>(x => cosmosDbConnector);
@@ -47,11 +48,6 @@ namespace all_tech_webapp_service
             app.MapControllers();
 
             app.Run();
-        }
-
-        public static string? GetAppSettingValue(WebApplicationBuilder builder, string key)
-        {
-            return builder.Configuration.GetValue<string>(key);
         }
 
         public static void AddServices(WebApplicationBuilder builder)

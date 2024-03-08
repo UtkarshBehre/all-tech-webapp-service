@@ -17,6 +17,7 @@ namespace all_tech_webapp_service.Models.ToDoItem
     public class ToDoItemUpdateRequest : ToDoItemRequest
     {
         [JsonProperty("id")]
+        [Required]
         public Guid Id { get; set; }
 
         [JsonProperty("isComplete")]
