@@ -3,6 +3,8 @@ using all_tech_webapp_service.Services.ToDoList;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Cosmos;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace all_tech_webapp_service.Controllers.ToDoList
 {
@@ -51,6 +53,11 @@ namespace all_tech_webapp_service.Controllers.ToDoList
             {
                 var toDoItemResponse = await _toDoListService.GetToDoItem(id);
                 return Ok(toDoItemResponse);
+            }
+            catch(CosmosException ex)
+            {
+                _telemetryClient.TrackTrace(ex.Message, Microsoft.ApplicationInsights.DataContracts.SeverityLevel.Information);
+                return NotFound(ex.Message);
             }
             catch (FileNotFoundException ex)
             {
