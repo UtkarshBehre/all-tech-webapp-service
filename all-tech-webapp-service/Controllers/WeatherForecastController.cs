@@ -21,11 +21,11 @@ namespace all_tech_webapp_service.Controllers
         public IEnumerable<WeatherForecast> Get()
         {
             _telemetryClient.TrackTrace($"{nameof(WeatherForecastController)}.{nameof(Get)}");
-            var weatherForecasts = new WeatherForecast[] { };
+            var weatherForecasts = Array.Empty<WeatherForecast>();
             
             try
             {
-                weatherForecasts = _weatherForecastService.getWeatherForecasts();
+                weatherForecasts = _weatherForecastService.GetWeatherForecasts();
             }
             catch (Exception ex)
             {

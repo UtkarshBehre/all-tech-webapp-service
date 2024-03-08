@@ -38,7 +38,7 @@ namespace all_tech_webapp_service.Controllers
 
         [HttpGet]
         [Route("getForbidden")]
-        public IActionResult getForbidden()
+        public IActionResult GetForbidden()
         {
             return StatusCode((int) HttpStatusCode.Forbidden);
         }

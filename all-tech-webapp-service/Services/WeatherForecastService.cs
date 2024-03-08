@@ -11,9 +11,9 @@ namespace all_tech_webapp_service.Services
             _telemetryClient = telemetryClient;
         }
 
-        public WeatherForecast[] getWeatherForecasts()
+        public WeatherForecast[] GetWeatherForecasts()
         {
-            _telemetryClient.TrackTrace($"{nameof(WeatherForecastService)}.{nameof(getWeatherForecasts)}");
+            _telemetryClient.TrackTrace($"{nameof(WeatherForecastService)}.{nameof(GetWeatherForecasts)}");
 
             var Summaries = new[]
             {
