@@ -36,7 +36,7 @@ namespace all_tech_webapp_service.Controllers.ToDoList
         }
 
         /// <summary>
-        /// 
+        /// Gets a To Do Item by Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>

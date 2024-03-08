@@ -28,7 +28,8 @@ namespace all_tech_webapp_service
 
             // SETUP COSMOS DB
 
-            var cosmosDbConfig = builder.Environment.IsDevelopment() ? new CosmosDbConfig(builder.Configuration) : new CosmosDbConfig(ConfigurationManager.AppSettings);
+            //var cosmosDbConfig = builder.Environment.IsDevelopment() ? new CosmosDbConfig(builder.Configuration) : new CosmosDbConfig(ConfigurationManager.AppSettings);
+            var cosmosDbConfig = new CosmosDbConfig(builder.Configuration);
             var cosmosDbConnector = new CosmosDbConnector(cosmosDbConfig);
 
             builder.Services.AddSingleton<ICosmosDbConnector>(x => cosmosDbConnector);
