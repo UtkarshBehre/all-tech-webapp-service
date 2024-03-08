@@ -1,14 +1,12 @@
 ﻿using all_tech_webapp_service.Models.ToDoItem;
 using all_tech_webapp_service.Services.ToDoList;
 using Microsoft.ApplicationInsights;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace all_tech_webapp_service.Controllers.ToDoList
 {
-    [Route("api/[controller]")]
+    [Route("api/todo")]
     [ApiController]
     public class ToDoListController : ControllerBase
     {
@@ -22,7 +20,7 @@ namespace all_tech_webapp_service.Controllers.ToDoList
         }
 
         [HttpGet]
-        [Route("getAll")]
+        [Route("all")]
         public async Task<IActionResult> GetAllToDoListItems()
         {
             try
@@ -46,8 +44,8 @@ namespace all_tech_webapp_service.Controllers.ToDoList
         /// <response code="404">If To Do Item was not found</response>
         /// <response code="500">If there was a problem getting Region Records</response>
         [HttpGet]
-        [Route("getById")]
-        public async Task<IActionResult> GetToDoItem(Guid id)
+        [Route("items/{id:guid}")]
+        public async Task<IActionResult> GetToDoItem([FromRoute] Guid id)
         {
             try
             {
@@ -88,7 +86,7 @@ namespace all_tech_webapp_service.Controllers.ToDoList
             }
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("update")]
         public async Task<IActionResult> UpdateToDoItem(ToDoItemUpdateRequest toDoItemUpdateRequest)
         {
@@ -111,8 +109,8 @@ namespace all_tech_webapp_service.Controllers.ToDoList
         }
 
         [HttpDelete]
-        [Route("delete")]
-        public async Task<IActionResult> DeleteToDoItem(Guid id)
+        [Route("delete/{id}")]
+        public async Task<IActionResult> DeleteToDoItem([FromRoute] Guid id)
         {
             try
             {
