@@ -8,7 +8,7 @@ namespace all_tech_webapp_service.Models
         public MappingProfiles()
         {
             CreateMap<ToDoItemCreateRequest, ToDoItemRecord>();
-            CreateMap<ToDoItemCreateRequest, ToDoItemRecord>();
+            CreateMap<ToDoItemRequest, ToDoItemRecord>();
             CreateMap<ToDoItemUpdateRequest, ToDoItemRecord>();
             CreateMap<ToDoItemRecord, ToDoItemResponse>();
         }
