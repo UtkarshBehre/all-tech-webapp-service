@@ -5,9 +5,9 @@ namespace all_tech_webapp_service.Models.ToDoItem
 {
     public class ToDoItemRequest
     {
-        [JsonProperty("taskTitle")]
+        [JsonProperty("title")]
         [Required]
-        public required string TaskTitle { get; set; }
+        public required string Title { get; set; }
     }
 
     public class ToDoItemCreateRequest : ToDoItemRequest

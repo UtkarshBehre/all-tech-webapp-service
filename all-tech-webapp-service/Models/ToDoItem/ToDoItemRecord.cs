@@ -5,8 +5,8 @@ namespace all_tech_webapp_service.Models.ToDoItem
 {
     public class ToDoItemRecord
     {
-        [JsonProperty("taskTitle")]
-        public required string TaskTitle { get; set; }
+        [JsonProperty("title")]
+        public required string Title { get; set; }
 
         [JsonProperty("id")]
         public Guid Id { get; set; }
