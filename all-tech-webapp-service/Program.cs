@@ -1,12 +1,12 @@
 using all_tech_webapp_service.Connectors;
 using all_tech_webapp_service.Models;
+using all_tech_webapp_service.Models.Config;
 using all_tech_webapp_service.Properties;
 using all_tech_webapp_service.Providers;
 using all_tech_webapp_service.Repositories.ToDoList;
 using all_tech_webapp_service.Services;
 using all_tech_webapp_service.Services.ToDoList;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 using ConfigurationManager = System.Configuration.ConfigurationManager;
 
 namespace all_tech_webapp_service
