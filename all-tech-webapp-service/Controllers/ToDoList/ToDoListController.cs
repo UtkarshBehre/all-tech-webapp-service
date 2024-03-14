@@ -25,6 +25,8 @@ namespace all_tech_webapp_service.Controllers.ToDoList
         {
             try
             {
+                Request.Headers.TryGetValue("Authorization", out var authHeader);
+                _telemetryClient.TrackTrace($"Authorization Header: {authHeader}", Microsoft.ApplicationInsights.DataContracts.SeverityLevel.Warning);
                 var toDoItemResponses = await _toDoListService.GetAllToDoItems();
                 return Ok(toDoItemResponses);
             }
