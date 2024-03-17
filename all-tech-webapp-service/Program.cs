@@ -44,9 +44,11 @@ namespace all_tech_webapp_service
 
             builder.Services.AddSingleton<ICosmosDbConnector>(x => cosmosDbConnector);
             
-            AddServices(builder);
-            var app = builder.Build();
 
+            AddServices(builder);
+            SetupAuth(builder.Services);
+
+            var app = builder.Build();
 
             // SETUP SWAGGER FOR ALL ENVIRONMENTS
             app.UseSwagger();
@@ -54,6 +56,8 @@ namespace all_tech_webapp_service
 
             app.UseHttpsRedirection();
 
+            
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();
@@ -80,73 +84,35 @@ namespace all_tech_webapp_service
 
         public static void SetupAuth(IServiceCollection services)
         {
-            string Issuer = "infologs.in";
-            string Audience = "global";
-                
+            string Issuer = "https://accounts.google.comasdfsdf";
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
+                options.Authority = Issuer;
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {
                     ValidateIssuer = true,
                     ValidIssuer = Issuer,
-                    ValidateAudience = true,
-                    ValidAudience = Audience,
+                    ValidateAudience = false, // Set to true if you want to validate audience
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                 };
-                options.Events = new JwtBearerEvents()
+                options.Events = new JwtBearerEvents
                 {
-                    OnTokenValidated = context =>
-                    {
-                        Console.WriteLine("OnTokenValidated");
-                        if (context.Request.Headers.ContainsKey("JWTToken"))
-                        {
-                            var Token = context.Request.Headers["JWTToken"].ToString();
-                            if (Token.StartsWith("Bearer"))
-                            {
-                                var token = Token.Substring(7).ToString();
-                            }
-                        }
-
-                        return Task.CompletedTask;
-                    },
                     OnMessageReceived = context =>
                     {
                         Console.WriteLine("OnMessageReceived");
-                        if (context.Request.Headers.ContainsKey("JWTToken"))
+                        if (context.Request.Headers.ContainsKey("Authorization"))
                         {
-                            var Token = context.Request.Headers["JWTToken"].ToString();
-                            if (Token.StartsWith("Bearer"))
+                            var token = context.Request.Headers["Authorization"].ToString();
+                            if (token.StartsWith("Bearer "))
                             {
-                                context.Token = Token.Substring(7).ToString();
+                                context.Token = token.Substring(7);
+                                Console.WriteLine($"Received token: {context.Token}");
                             }
                         }
                         return Task.CompletedTask;
-                    },
-                    OnAuthenticationFailed = context =>
-                    {
-                        Console.WriteLine("OnAuthenticationFailed");
-                        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                        context.Response.ContentType = context.Request.Headers["Accept"].ToString();
-                        string _Message = "Authentication token is invalid.";
-                        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
-                        {
-                            //context.Response.Headers.Add("Token-Expired", "true");
-                            //OR
-                            _Message = "Token has expired.";
-                            return context.Response.WriteAsync(JsonConvert.SerializeObject(new
-                            {
-                                StatusCode = (int)HttpStatusCode.Unauthorized,
-                                Message = _Message
-                            }));
-                        }
-                        return context.Response.WriteAsync(JsonConvert.SerializeObject(new
-                        {
-                            StatusCode = (int)HttpStatusCode.Unauthorized,
-                            Message = _Message
-                        }));
-                        //return Task.CompletedTask;
                     }
                 };
             });
