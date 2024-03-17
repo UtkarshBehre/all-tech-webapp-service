@@ -1,12 +1,22 @@
 using all_tech_webapp_service.Connectors;
-using all_tech_webapp_service.Models;
 using all_tech_webapp_service.Models.Config;
 using all_tech_webapp_service.Properties;
 using all_tech_webapp_service.Providers;
-using all_tech_webapp_service.Repositories.ToDoList;
+using all_tech_webapp_service.Repositories.Todo.TodoGroupRepository;
+using all_tech_webapp_service.Repositories.Todo.TodoItem;
+using all_tech_webapp_service.Repositories.Todo.UserTodo;
+using all_tech_webapp_service.Repositories.User;
 using all_tech_webapp_service.Services;
-using all_tech_webapp_service.Services.ToDoList;
+using all_tech_webapp_service.Services.Todo.Group;
+using all_tech_webapp_service.Services.Todo.Item;
+using all_tech_webapp_service.Services.Todo.UserTodo;
+using all_tech_webapp_service.Services.User;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using System.Net;
+using System.Text;
 using ConfigurationManager = System.Configuration.ConfigurationManager;
 
 namespace all_tech_webapp_service
@@ -55,9 +65,91 @@ namespace all_tech_webapp_service
         {
             builder.Services.AddSingleton<IAutoMapperProvider, AutoMapperProvider>();
 
-            builder.Services.AddScoped<IWeatherForecastService, WeatherForecastService>();
-            builder.Services.AddScoped<IToDoListRepository, ToDoListRepository>();
-            builder.Services.AddScoped<IToDoListService, ToDoListService>();
+            // repos
+            builder.Services.AddScoped<ITodoItemRepository, TodoItemRepository>();
+            builder.Services.AddScoped<ITodoGroupRepository, TodoGroupRepository>();
+            builder.Services.AddScoped<IUserTodoRepository, UserTodoRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+            // services
+            builder.Services.AddScoped<ITodoItemService, TodoItemService>();
+            builder.Services.AddScoped<ITodoGroupService, TodoGroupService>();
+            builder.Services.AddScoped<IUserTodoService, UserTodoService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+        }
+
+        public static void SetupAuth(IServiceCollection services)
+        {
+            string Issuer = "infologs.in";
+            string Audience = "global";
+                
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = Issuer,
+                    ValidateAudience = true,
+                    ValidAudience = Audience,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                };
+                options.Events = new JwtBearerEvents()
+                {
+                    OnTokenValidated = context =>
+                    {
+                        Console.WriteLine("OnTokenValidated");
+                        if (context.Request.Headers.ContainsKey("JWTToken"))
+                        {
+                            var Token = context.Request.Headers["JWTToken"].ToString();
+                            if (Token.StartsWith("Bearer"))
+                            {
+                                var token = Token.Substring(7).ToString();
+                            }
+                        }
+
+                        return Task.CompletedTask;
+                    },
+                    OnMessageReceived = context =>
+                    {
+                        Console.WriteLine("OnMessageReceived");
+                        if (context.Request.Headers.ContainsKey("JWTToken"))
+                        {
+                            var Token = context.Request.Headers["JWTToken"].ToString();
+                            if (Token.StartsWith("Bearer"))
+                            {
+                                context.Token = Token.Substring(7).ToString();
+                            }
+                        }
+                        return Task.CompletedTask;
+                    },
+                    OnAuthenticationFailed = context =>
+                    {
+                        Console.WriteLine("OnAuthenticationFailed");
+                        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                        context.Response.ContentType = context.Request.Headers["Accept"].ToString();
+                        string _Message = "Authentication token is invalid.";
+                        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                        {
+                            //context.Response.Headers.Add("Token-Expired", "true");
+                            //OR
+                            _Message = "Token has expired.";
+                            return context.Response.WriteAsync(JsonConvert.SerializeObject(new
+                            {
+                                StatusCode = (int)HttpStatusCode.Unauthorized,
+                                Message = _Message
+                            }));
+                        }
+                        return context.Response.WriteAsync(JsonConvert.SerializeObject(new
+                        {
+                            StatusCode = (int)HttpStatusCode.Unauthorized,
+                            Message = _Message
+                        }));
+                        //return Task.CompletedTask;
+                    }
+                };
+            });
         }
     }
 }

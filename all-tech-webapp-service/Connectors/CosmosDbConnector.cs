@@ -1,4 +1,5 @@
 ﻿using all_tech_webapp_service.Models.Config;
+using all_tech_webapp_service.Models.Todo;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Linq;
 using System.Linq.Expressions;
@@ -13,8 +14,13 @@ namespace all_tech_webapp_service.Connectors
     {
         private readonly CosmosClient _client;
         private readonly string _databaseName;
-        private readonly string _containerName;
-        private readonly string _partitionKey;
+        private readonly string TODO_ITEMS_CONTAINER_NAME;
+        private readonly string TODO_ITEMS_PARTITION_KEY;
+        private readonly string USERS_CONTAINER_NAME;
+        private readonly string USERS_PARTITION_KEY;
+        private readonly string USERS_TODO_CONTAINER_NAME;
+        private readonly string USERS_TODO_PARTITION_KEY;
+
 
         /// <summary>
         /// Constructor
@@ -28,8 +34,13 @@ namespace all_tech_webapp_service.Connectors
         {
             _client = new CosmosClient(cosmosDbConfig.ConnectionString) ?? throw new ArgumentException($"Unable to cosmos db client because following found as incorrect : {nameof(cosmosDbConfig.ConnectionString)}");
             _databaseName = cosmosDbConfig.DatabaseName;
-            _containerName = cosmosDbConfig.ContainerName;
-            _partitionKey = cosmosDbConfig.PartitionKey;
+            
+            TODO_ITEMS_CONTAINER_NAME = cosmosDbConfig.TodoItemsContainerName;
+            TODO_ITEMS_PARTITION_KEY = cosmosDbConfig.TodoItemsPartitionKey;
+            USERS_CONTAINER_NAME = cosmosDbConfig.UsersContainerName;
+            USERS_PARTITION_KEY = cosmosDbConfig.UsersPartitionKey;
+            USERS_TODO_CONTAINER_NAME = cosmosDbConfig.UsersTodoContainerName;
+            USERS_TODO_PARTITION_KEY = cosmosDbConfig.UsersTodoPartitionKey;
         }
 
         private async Task<Database> GetDatabase()
@@ -43,22 +54,20 @@ namespace all_tech_webapp_service.Connectors
             return await database.CreateContainerIfNotExistsAsync(containerName, partitionKey);
         }
 
-        private async Task<Container> GetContainer()
+        private async Task<Container> GetContainer(RecordType recordType)
         {
-            var database = await GetDatabase();
-            return await database.CreateContainerIfNotExistsAsync(_containerName, _partitionKey);
+            return recordType switch
+            {
+                RecordType.TodoItem or RecordType.TodoGroup => await GetContainer(TODO_ITEMS_CONTAINER_NAME, TODO_ITEMS_PARTITION_KEY),
+                RecordType.UserTodo => await GetContainer(USERS_TODO_CONTAINER_NAME, USERS_TODO_PARTITION_KEY),
+                RecordType.User => await GetContainer(USERS_CONTAINER_NAME, USERS_PARTITION_KEY),
+                _ => await GetContainer(TODO_ITEMS_CONTAINER_NAME, TODO_ITEMS_PARTITION_KEY),
+            };
         }
 
-        /// <summary>
-        /// Creates new Item in CosmosDb in the DEFAULT container
-        /// </summary>
-        /// <typeparam name="T">Item Object Type</typeparam>
-        /// <param name="item">Item</param>
-        /// <returns>T</returns>
-        /// <exception cref="Exception"></exception>
-        public async Task<T> CreateItemAsync<T>(T item)
+        public async Task<T> CreateItemAsync<T>(T item, RecordType recordType)
         {
-            var container = await GetContainer();
+            var container = await GetContainer(recordType);
             var itemResponse = await container.CreateItemAsync(item);
             if (itemResponse.StatusCode != HttpStatusCode.Created)
             {
@@ -67,36 +76,9 @@ namespace all_tech_webapp_service.Connectors
             return itemResponse.Resource;
         }
 
-        /// <summary>
-        /// Reads an Item from CosmosDb in the DEFAULT container
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        public async Task<T> ReadItemAsync<T>(string id)
+        public async Task<T> ReadItemAsync<T>(string id, string partitionKey, RecordType recordType)
         {
-            var container = await GetContainer();
-            var itemResponse = await container.ReadItemAsync<T>(id, new PartitionKey(id));
-            if (itemResponse.StatusCode != HttpStatusCode.OK)
-            {
-                throw new Exception($"Failed to process item: {itemResponse.StatusCode} | {itemResponse.Diagnostics}");
-            }
-            return itemResponse.Resource;
-        }
-
-        /// <summary>
-        /// Reads an Item from CosmosDb in the SPECIFIED container
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="id"></param>
-        /// <param name="containerName"></param>
-        /// <param name="partitionKey"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        public async Task<T> ReadItemAsync<T>(string id, string containerName, string partitionKey)
-        {
-            var container = await GetContainer(containerName, partitionKey);
+            var container = await GetContainer(recordType);
             var itemResponse = await container.ReadItemAsync<T>(id, new PartitionKey(partitionKey));
             if (itemResponse.StatusCode != HttpStatusCode.OK)
             {
@@ -105,15 +87,10 @@ namespace all_tech_webapp_service.Connectors
             return itemResponse.Resource;
         }
 
-        /// <summary>
-        /// Get all items from CosmosDb in the DEFAULT container
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public async Task<List<T>> ReadItemsAsync<T>()
+        public async Task<List<T>> ReadItemsAsync<T>(RecordType recordType, Expression<Func<T, bool>> predicate)
         {
-            var container = await GetContainer();
-            var iterator = container.GetItemLinqQueryable<T>().ToFeedIterator();
+            var container = await GetContainer(recordType);
+            var iterator = container.GetItemLinqQueryable<T>().Where(predicate) .ToFeedIterator();
             var items = new List<T>();
             while (iterator.HasMoreResults)
             {
@@ -123,38 +100,16 @@ namespace all_tech_webapp_service.Connectors
             return items;
         }
 
-        /// <summary>
-        /// Get all items from CosmosDb in the SPECIFIED container
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="containerName"></param>
-        /// <param name="partitionKey"></param>
-        /// <returns></returns>
-        public async Task<List<T>> ReadItemsAsync<T>(string containerName, string partitionKey)
+        public async Task<T> UpdateItemAsync<T>(T item, string partitionKey, RecordType recordType, string etag)
         {
-            var container = await GetContainer(containerName, partitionKey);
-            var iterator = container.GetItemLinqQueryable<T>().ToFeedIterator();
-            var items = new List<T>();
-            while (iterator.HasMoreResults)
-            {
-                var response = await iterator.ReadNextAsync();
-                items.AddRange(response);
-            }
-            return items;
-        }
+            var container = await GetContainer(recordType);
 
-        /// <summary>
-        /// Updates an Item in CosmosDb in the DEFAULT container
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="item"></param>
-        /// <param name="partitionKey"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        public async Task<T> UpdateItemAsync<T>(T item, string partitionKey)
-        {
-            var container = await GetContainer();
-            var itemResponse = await container.UpsertItemAsync(item, new PartitionKey(partitionKey));
+            ItemRequestOptions itemRequestOptions = new ItemRequestOptions
+            {
+                IfMatchEtag = etag
+            };
+
+            var itemResponse = await container.UpsertItemAsync(item, new PartitionKey(partitionKey), requestOptions: itemRequestOptions);
             if (itemResponse.StatusCode != HttpStatusCode.OK)
             {
                 throw new Exception($"Failed to update item: {itemResponse.StatusCode} | {itemResponse.Diagnostics}");
@@ -162,56 +117,9 @@ namespace all_tech_webapp_service.Connectors
             return itemResponse.Resource;
         }
 
-        /// <summary>
-        /// Updates an Item in CosmosDb in the SPECIFIED container
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="item"></param>
-        /// <param name="containerName"></param>
-        /// <param name="partitionKey"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        public async Task<T> UpdateItemAsync<T>(T item, string containerName, string partitionKey)
+        public async Task<ItemResponse<T>> DeleteItemAsync<T>(string id, string partitionKey, RecordType recordType)
         {
-            var container = await GetContainer(containerName, partitionKey);
-            var itemResponse = await container.UpsertItemAsync(item, new PartitionKey(partitionKey));
-            if (itemResponse.StatusCode != HttpStatusCode.OK)
-            {
-                throw new Exception($"Failed to update item: {itemResponse.StatusCode} | {itemResponse.Diagnostics}");
-            }
-            return itemResponse.Resource;
-        }
-
-        /// <summary>
-        /// Deletes an Item with given id in CosmosDb in the DEFAULT container
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        public async Task<ItemResponse<T>> DeleteItemAsync<T>(string id)
-        {
-            var container = await GetContainer();
-            var itemResponse = await container.DeleteItemAsync<T>(id, new PartitionKey(_partitionKey));
-            if (itemResponse.StatusCode != HttpStatusCode.NoContent)
-            {
-                throw new Exception($"Failed to delete item: {itemResponse.StatusCode} | {itemResponse.Diagnostics}");
-            }
-            return itemResponse;
-        }
-
-        /// <summary>
-        /// Deletes an Item with given id in CosmosDb in the SPECIFIED container
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="id"></param>
-        /// <param name="containerName"></param>
-        /// <param name="partitionKey"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        public async Task<ItemResponse<T>> DeleteItemAsync<T>(string id, string containerName, string partitionKey)
-        {
-            var container = await GetContainer(containerName, partitionKey);
+            var container = await GetContainer(recordType);
             var itemResponse = await container.DeleteItemAsync<T>(id, new PartitionKey(partitionKey));
             if (itemResponse.StatusCode != HttpStatusCode.NoContent)
             {

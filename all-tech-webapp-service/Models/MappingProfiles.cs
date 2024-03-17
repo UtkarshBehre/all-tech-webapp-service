@@ -1,4 +1,7 @@
-﻿using all_tech_webapp_service.Models.ToDoItem;
+﻿using all_tech_webapp_service.Models.Todo.Group;
+using all_tech_webapp_service.Models.Todo.Item;
+using all_tech_webapp_service.Models.Todo.UserTodo;
+using all_tech_webapp_service.Models.User;
 using AutoMapper;
 
 namespace all_tech_webapp_service.Models
@@ -7,10 +10,30 @@ namespace all_tech_webapp_service.Models
     {
         public MappingProfiles()
         {
-            CreateMap<ToDoItemCreateRequest, ToDoItemRecord>();
-            CreateMap<ToDoItemRequest, ToDoItemRecord>();
-            CreateMap<ToDoItemUpdateRequest, ToDoItemRecord>();
-            CreateMap<ToDoItemRecord, ToDoItemResponse>();
+            // Todo Item
+
+            CreateMap<TodoItemCreateRequest, TodoItemRecord>();
+            CreateMap<TodoItemRequest, TodoItemRecord>();
+            CreateMap<TodoItemUpdateRequest, TodoItemRecord>();
+            CreateMap<TodoItemRecord, TodoItemResponse>();
+
+            // Todo Group
+            CreateMap<TodoGroupCreateRequest, TodoGroupRecord>();
+            CreateMap<TodoGroupRequest, TodoGroupRecord>();
+            CreateMap<TodoGroupUpdateRequest, TodoGroupRecord>();
+            CreateMap<TodoGroupRecord, TodoGroupResponse>();
+
+            // User Todo
+            CreateMap<UserTodoCreateRequest, UserTodoRecord>();
+            CreateMap<UserTodoRequest, UserTodoRecord>();
+            CreateMap<UserTodoUpdateRequest, UserTodoRecord>();
+            CreateMap<UserTodoRecord, UserTodoResponse>();
+
+            // User
+            CreateMap<UserCreateRequest, UserRecord>();
+            CreateMap<UserRequest, UserRecord>();
+            CreateMap<UserUpdateRequest, UserRecord>();
+            CreateMap<UserRecord, UserResponse>();
         }
     }
 }

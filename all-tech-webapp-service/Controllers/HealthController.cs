@@ -29,7 +29,7 @@ namespace all_tech_webapp_service.Controllers
             return this.BadRequest("400 bad request");
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("getUnauthorized")]
         public IActionResult GetUnauthorized()
         {

@@ -7,23 +7,23 @@ namespace all_tech_webapp_service.Models.Config
     {
         public string ConnectionString { get; set; }
         public string DatabaseName { get; set; }
-        public string ContainerName { get; set; }
-        public string PartitionKey { get; set; }
+        public string TodoItemsContainerName { get; private set; }
+        public string TodoItemsPartitionKey { get; private set; }
+        public string UsersContainerName { get; private set; }
+        public string UsersPartitionKey { get; private set; }
+        public string UsersTodoContainerName { get; private set; }
+        public string UsersTodoPartitionKey { get; private set; }
 
         public CosmosDbConfig(ConfigurationManager configuration)
         {
             ConnectionString = configuration.GetValue<string>(Constants.COSMOSDB_CONNECTION_STRING) ?? string.Empty;
             DatabaseName = configuration.GetValue<string>(Constants.COSMOSDB_DATABASE_NAME) ?? string.Empty;
-            ContainerName = configuration.GetValue<string>(Constants.COSMOSDB_CONTAINER_NAME) ?? string.Empty;
-            PartitionKey = configuration.GetValue<string>(Constants.COSMOSDB_PARTITION_KEY) ?? string.Empty;
-        }
-
-        public CosmosDbConfig(NameValueCollection appSettings)
-        {
-            ConnectionString = appSettings[Constants.COSMOSDB_CONNECTION_STRING] ?? string.Empty;
-            DatabaseName = appSettings[Constants.COSMOSDB_DATABASE_NAME] ?? string.Empty;
-            ContainerName = appSettings[Constants.COSMOSDB_CONTAINER_NAME] ?? string.Empty;
-            PartitionKey = appSettings[Constants.COSMOSDB_PARTITION_KEY] ?? string.Empty;
+            TodoItemsContainerName = configuration.GetValue<string>(Constants.COSMOSDB_TODO_CONTAINER_NAME) ?? string.Empty;
+            TodoItemsPartitionKey = configuration.GetValue<string>(Constants.COSMOSDB_TODO_PARTITION_KEY) ?? string.Empty;
+            UsersContainerName = configuration.GetValue<string>(Constants.COSMOSDB_USERS_CONTAINER_NAME) ?? string.Empty;
+            UsersPartitionKey = configuration.GetValue<string>(Constants.COSMOSDB_USERS_PARTITION_KEY) ?? string.Empty;
+            UsersTodoContainerName = configuration.GetValue<string>(Constants.COSMOSDB_USERSTODO_CONTAINER_NAME) ?? string.Empty;
+            UsersTodoPartitionKey = configuration.GetValue<string>(Constants.COSMOSDB_USERSTODO_PARTITION_KEY) ?? string.Empty;
         }
     }
 }
