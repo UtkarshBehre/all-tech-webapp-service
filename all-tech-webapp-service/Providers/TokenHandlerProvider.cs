@@ -28,7 +28,7 @@ namespace all_tech_webapp_service.Providers
             {
                 return;
             }*/
-
+            
             _jwtToken = _handler.ReadJwtToken(token.Substring("Bearer ".Length));
         }
 
