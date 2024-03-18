@@ -43,6 +43,13 @@ namespace all_tech_webapp_service.Services.User
             return userResponse;
         }
 
+        public async Task<UserResponse> GetUserByGoogleId(string googleId)
+        {
+            var userRecord = await _UserRepository.GetUserByGoogleId(googleId);
+            var userResponse = _autoMapperProvider.Mapper.Map<UserResponse>(userRecord);
+            return userResponse;
+        }
+
         public async Task<UserResponse> UpdateUser(Guid id, UserUpdateRequest userUpdateRequest)
         {
             var userRecord = await _UserRepository.GetUser(id);

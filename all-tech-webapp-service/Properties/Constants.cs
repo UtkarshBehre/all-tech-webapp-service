@@ -11,6 +11,8 @@
         public const string COSMOSDB_USERSTODO_CONTAINER_NAME = "CosmosDbConfig:UsersTodo:ContainerName";
         public const string COSMOSDB_USERSTODO_PARTITION_KEY = "CosmosDbConfig:UsersTodo:PartitionKey";
 
+        public const string ISSUER = "Token:Issuer";
+        public const string AUDIENCE = "Token:Audience";
         public const string APPLICATIONINSIGHTS_CONNECTION_STRING = "APPLICATIONINSIGHTS_CONNECTION_STRING";
     }
 }

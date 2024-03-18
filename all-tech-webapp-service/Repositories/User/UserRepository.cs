@@ -38,6 +38,24 @@ namespace all_tech_webapp_service.Repositories.User
             }
             return userRecord;
         }
+
+        public async Task<UserRecord> GetUserByGoogleId(string id)
+        {
+            Expression<Func<UserRecord, bool>> predicate = x
+                => x.RecordType == RecordType.User &&
+                   x.GoogleId == id &&
+                   !x.IsDeleted;
+
+            var userRecords = await _cosmosDbConnector.ReadItemsAsync<UserRecord>(RecordType.User, predicate);
+
+            var userRecord = userRecords.FirstOrDefault();
+            if (userRecord == null || userRecord.IsDeleted)
+            {
+                throw new FileNotFoundException($"No User Record Found with the given Id: {id}");
+            }
+            return userRecord;
+        }
+
         public async Task<UserRecord> UpdateUser(UserRecord user)
         {
             var existingUser = await GetUser(user.Id);

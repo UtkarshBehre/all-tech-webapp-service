@@ -1,9 +1,8 @@
 ﻿using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using System;
 
 namespace all_tech_webapp_service.Middlewares
 {
@@ -40,6 +39,24 @@ namespace all_tech_webapp_service.Middlewares
                 };
                 await response.WriteAsync(JsonConvert.SerializeObject(problemDetails));
             }
+            catch (Exception ex) when (ex is SecurityTokenExpiredException ||
+                                       ex is SecurityTokenInvalidAudienceException ||
+                                       ex is SecurityTokenInvalidIssuerException)
+            {
+                var error = $"{context.Request.Path}: {ex.Message}. StackTrace: {ex.StackTrace}";
+                _telemetryClient.TrackTrace(error, SeverityLevel.Information);
+                var response = context.Response;
+                response.ContentType = "application/json";
+                response.StatusCode = StatusCodes.Status401Unauthorized;
+                var problemDetails = new ProblemDetails
+                {
+                    Title = "Unauthorized",
+                    Status = response.StatusCode,
+                    Detail = ex.Message,
+                    Instance = context.Request.Path
+                };
+                await response.WriteAsync(JsonConvert.SerializeObject(problemDetails));
+            }
             catch (FileNotFoundException ex)
             {
                 var error = $"{context.Request.Path}: {ex.Message}. StackTrace: {ex.StackTrace}";
@@ -62,7 +79,7 @@ namespace all_tech_webapp_service.Middlewares
                 _telemetryClient.TrackTrace(error, SeverityLevel.Information);
                 var response = context.Response;
                 response.ContentType = "application/json";
-                response.StatusCode = StatusCodes.Status404NotFound;
+                response.StatusCode = (int)ex.StatusCode;
                 var problemDetails = new ProblemDetails
                 {
                     Title = "An error during transaction occurred",
@@ -77,7 +94,7 @@ namespace all_tech_webapp_service.Middlewares
                 _telemetryClient.TrackException(ex);
                 var response = context.Response;
                 response.ContentType = "application/json";
-                response.StatusCode = StatusCodes.Status500InternalServerError
+                response.StatusCode = StatusCodes.Status500InternalServerError;
                 var problemDetails = new ProblemDetails
                 {
                     Title = "An invalid operation occurred",

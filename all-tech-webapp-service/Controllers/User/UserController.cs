@@ -4,6 +4,7 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
+using all_tech_webapp_service.Providers;
 
 namespace all_tech_webapp_service.Controllers.User
 {
@@ -13,30 +14,30 @@ namespace all_tech_webapp_service.Controllers.User
     {
         private readonly IUserService _userService;
         private readonly TelemetryClient _telemetryClient;
+        private readonly ITokenHandlerProvider _tokenHandlerProvider;
 
-        public UserController(IUserService userService, TelemetryClient telemetryClient)
+        public UserController(IUserService userService, ITokenHandlerProvider tokenHandlerProvider, TelemetryClient telemetryClient)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _tokenHandlerProvider = tokenHandlerProvider ?? throw new ArgumentNullException(nameof(tokenHandlerProvider));
             _telemetryClient = telemetryClient ?? throw new ArgumentNullException(nameof(telemetryClient));
         }
 
         [HttpGet]
-        [Route("{id:guid}")]
-        public async Task<IActionResult> GetUser([FromRoute] Guid id)
+        [Route("")]
+        public async Task<IActionResult> GetUser()
         {
-            //Request.Headers.TryGetValue("Authorization", out var authToken);
-            //Console.WriteLine(TokenHandleProvider.GetSubFromToken(authToken));
-            //_telemetryClient.TrackTrace($"Authorization Header: {authToken}", Microsoft.ApplicationInsights.DataContracts.SeverityLevel.Warning);
-
-            var userResponse = await _userService.GetUser(id);
+            var googleId = _tokenHandlerProvider.GetSubFromToken();
+            var userResponse = await _userService.GetUserByGoogleId(googleId);
             return Ok(userResponse);
         }
 
         [HttpPost]
         [Route("create")]
-        public async Task<IActionResult> CreateUser(UserCreateRequest userRequest)
+        public async Task<IActionResult> CreateUser()
         {
-            var userResponse = await _userService.CreateUser(userRequest);
+            var userCreateRequest = _tokenHandlerProvider.GetUserCreateRequestFromToken();
+            var userResponse = await _userService.CreateUser(userCreateRequest);
             return Ok(userResponse);
         }
 

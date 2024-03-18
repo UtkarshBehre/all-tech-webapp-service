@@ -13,12 +13,6 @@ using all_tech_webapp_service.Services.Todo.Item;
 using all_tech_webapp_service.Services.Todo.UserTodo;
 using all_tech_webapp_service.Services.User;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net;
-using System.Text;
 using ConfigurationManager = System.Configuration.ConfigurationManager;
 
 namespace all_tech_webapp_service
@@ -45,19 +39,23 @@ namespace all_tech_webapp_service
             var cosmosDbConnector = new CosmosDbConnector(cosmosDbConfig);
 
             builder.Services.AddSingleton<ICosmosDbConnector>(x => cosmosDbConnector);
-            
+
+            var tokenHandlerProvider = new TokenHandlerProvider(builder.Environment, builder.Configuration);
+            builder.Services.AddSingleton<ITokenHandlerProvider>(x => tokenHandlerProvider);
 
             AddServices(builder);
 
             var app = builder.Build();
 
             // SETUP SWAGGER FOR ALL ENVIRONMENTS
+            app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            app.UseHttpsRedirection();
             app.UseMiddleware<AuthenticationHandlerMiddleware>();
-            app.UseMiddleware<ExceptionHandlerMiddleware>();
+            
+            app.UseHttpsRedirection();
+            
             app.UseAuthorization();
 
             app.MapControllers();
@@ -81,13 +79,5 @@ namespace all_tech_webapp_service
             builder.Services.AddScoped<IUserTodoService, UserTodoService>();
             builder.Services.AddScoped<IUserService, UserService>();
         }
-
-/*        public static void SetupAuth(IServiceCollection services)
-        {
-            
-
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options => TokenHandleProvider.ConfigureOptions(options));
-        }*/
     }
 }
