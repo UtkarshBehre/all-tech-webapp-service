@@ -19,8 +19,8 @@ namespace all_tech_webapp_service.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-            Console.WriteLine($"nameof(AuthenticationHandlerMiddleware) invoked");
             var token = context.Request.Headers["Authorization"].FirstOrDefault();
+            _telemetryClient.TrackTrace($"Token: {token}");
             _tokenHandleProvider.SetToken(token);
             _tokenHandleProvider.ValidateToken();
             await _next.Invoke(context);
