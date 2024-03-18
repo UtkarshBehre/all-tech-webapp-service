@@ -1,4 +1,5 @@
 using all_tech_webapp_service.Connectors;
+using all_tech_webapp_service.Middlewares;
 using all_tech_webapp_service.Models.Config;
 using all_tech_webapp_service.Properties;
 using all_tech_webapp_service.Providers;
@@ -15,6 +16,7 @@ using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Text;
 using ConfigurationManager = System.Configuration.ConfigurationManager;
@@ -46,7 +48,6 @@ namespace all_tech_webapp_service
             
 
             AddServices(builder);
-            SetupAuth(builder.Services);
 
             var app = builder.Build();
 
@@ -55,9 +56,8 @@ namespace all_tech_webapp_service
             app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
-
-            
-            app.UseAuthentication();
+            app.UseMiddleware<AuthenticationHandlerMiddleware>();
+            app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseAuthorization();
 
             app.MapControllers();
@@ -82,40 +82,12 @@ namespace all_tech_webapp_service
             builder.Services.AddScoped<IUserService, UserService>();
         }
 
-        public static void SetupAuth(IServiceCollection services)
+/*        public static void SetupAuth(IServiceCollection services)
         {
-            string Issuer = "https://accounts.google.comasdfsdf";
+            
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                options.Authority = Issuer;
-                options.TokenValidationParameters = new TokenValidationParameters()
-                {
-                    ValidateIssuer = true,
-                    ValidIssuer = Issuer,
-                    ValidateAudience = false, // Set to true if you want to validate audience
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                };
-                options.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = context =>
-                    {
-                        Console.WriteLine("OnMessageReceived");
-                        if (context.Request.Headers.ContainsKey("Authorization"))
-                        {
-                            var token = context.Request.Headers["Authorization"].ToString();
-                            if (token.StartsWith("Bearer "))
-                            {
-                                context.Token = token.Substring(7);
-                                Console.WriteLine($"Received token: {context.Token}");
-                            }
-                        }
-                        return Task.CompletedTask;
-                    }
-                };
-            });
-        }
+            .AddJwtBearer(options => TokenHandleProvider.ConfigureOptions(options));
+        }*/
     }
 }

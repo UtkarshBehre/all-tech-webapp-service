@@ -24,93 +24,36 @@ namespace all_tech_webapp_service.Controllers.User
         [Route("{id:guid}")]
         public async Task<IActionResult> GetUser([FromRoute] Guid id)
         {
-            try
-            {
-                var userResponse = await _userService.GetUser(id);
-                return Ok(userResponse);
-            }
-            catch (CosmosException ex)
-            {
-                _telemetryClient.TrackTrace(ex.Message, SeverityLevel.Information);
-                return NotFound(ex.Message);
-            }
-            catch (FileNotFoundException ex)
-            {
-                var error = $"{ex.Message}. StackTrace: {ex.StackTrace}";
-                _telemetryClient.TrackTrace(error, SeverityLevel.Information);
-                return NotFound(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                _telemetryClient.TrackException(ex);
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            //Request.Headers.TryGetValue("Authorization", out var authToken);
+            //Console.WriteLine(TokenHandleProvider.GetSubFromToken(authToken));
+            //_telemetryClient.TrackTrace($"Authorization Header: {authToken}", Microsoft.ApplicationInsights.DataContracts.SeverityLevel.Warning);
+
+            var userResponse = await _userService.GetUser(id);
+            return Ok(userResponse);
         }
 
         [HttpPost]
         [Route("create")]
         public async Task<IActionResult> CreateUser(UserCreateRequest userRequest)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-                    
-
-                var userResponse = await _userService.CreateUser(userRequest);
-                return Ok(userResponse);
-            }
-            catch (Exception ex)
-            {
-                _telemetryClient.TrackException(ex);
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            var userResponse = await _userService.CreateUser(userRequest);
+            return Ok(userResponse);
         }
 
         [HttpPut]
         [Route("update/{id:guid}")]
         public async Task<IActionResult> UpdateUser([FromRoute] Guid id, UserUpdateRequest userUpdateRequest)
         {
-            try
-            {
-                var userResponse = await _userService.UpdateUser(id, userUpdateRequest);
-                return Ok(userResponse);
-            }
-            catch (FileNotFoundException ex)
-            {
-                var error = $"{ex.Message}. StackTrace: {ex.StackTrace}";
-                _telemetryClient.TrackTrace(error, SeverityLevel.Information);
-                return NotFound(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                _telemetryClient.TrackException(ex);
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            var userResponse = await _userService.UpdateUser(id, userUpdateRequest);
+            return Ok(userResponse);
         }
 
         [HttpDelete]
         [Route("delete/{id}")]
         public async Task<IActionResult> DeleteUser([FromRoute] Guid id)
         {
-            try
-            {
-                var isDeleted = await _userService.DeleteUser(id);
-                return Ok(isDeleted);
-            }
-            catch (FileNotFoundException ex)
-            {
-                var error = $"{ex.Message}. StackTrace: {ex.StackTrace}";
-                _telemetryClient.TrackTrace(error, SeverityLevel.Information);
-                return NotFound(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                _telemetryClient.TrackException(ex);
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            var isDeleted = await _userService.DeleteUser(id);
+            return Ok(isDeleted);
         }
     }
 }
