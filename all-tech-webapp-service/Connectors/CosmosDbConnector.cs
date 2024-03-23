@@ -45,7 +45,8 @@ namespace all_tech_webapp_service.Connectors
 
         private async Task<Database> GetDatabase()
         {
-            return await _client.CreateDatabaseIfNotExistsAsync(_databaseName);
+            ThroughputProperties autoscaleThroughputProperties = ThroughputProperties.CreateAutoscaleThroughput(1000);
+            return await _client.CreateDatabaseIfNotExistsAsync(_databaseName, throughputProperties: autoscaleThroughputProperties);
         }
 
         private async Task<Container> GetContainer(string containerName, string partitionKey)

@@ -51,20 +51,17 @@ namespace all_tech_webapp_service.Services.User
             
             userRecord = await _UserRepository.CreateUser(userRecord);
 
-            Task.Delay(1000).Wait(); // Simulating a delay of .1 second
             var todoGroup = await _todoGroupService.CreateTodoGroup(new TodoGroupCreateRequest
             {
                 Name = "Default",
             });
 
-            Task.Delay(1000).Wait(); // Simulating a delay of .1 second
             await _userTodoService.CreateUserTodo(new UserTodoCreateRequest
             {
                 Id = userRecord.Id,
                 GroupIds = new List<Guid> { todoGroup.Id }
             });
 
-            Task.Delay(1000).Wait(); // Simulating a delay of .1 second
             await _todoItemService.CreateTodoItem(new TodoItemCreateRequest
             {
                 GroupId = todoGroup.Id,
