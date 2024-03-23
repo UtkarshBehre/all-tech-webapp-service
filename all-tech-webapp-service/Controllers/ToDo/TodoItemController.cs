@@ -21,15 +21,23 @@ namespace all_tech_webapp_service.Controllers.Todo
         }
         
         [HttpGet]
-        [Route("all/{userId:guid}")]
-        public async Task<IActionResult> GetAllTodoItems([FromRoute] Guid userId)
+        [Route("all/userId={userId:guid}")]
+        public async Task<IActionResult> GetAllTodoItemsByUserId([FromRoute] Guid userId)
         {
             var todoItemResponses = await _todoItemService.GetAllTodoItemsByUser(userId);
             return Ok(todoItemResponses);
         }
 
         [HttpGet]
-        [Route("all/{groupId:guid}/{isComplete:bool}")]
+        [Route("all/groupId={groupId:guid}")]
+        public async Task<IActionResult> GetAllTodoItemsByGroupId([FromRoute] Guid groupId)
+        {
+            var todoItemResponses = await _todoItemService.GetAllTodoItemsByGroupId(groupId);
+            return Ok(todoItemResponses);
+        }
+
+        [HttpGet]
+        [Route("all/groupId={groupId:guid};isComplete={isComplete:bool}")]
         public async Task<IActionResult> GetAllTodoItemsByGroupId([FromRoute] Guid groupId, [FromRoute] bool isComplete)
         {
             var todoItemResponses = await _todoItemService.GetAllTodoItemsByGroupId(groupId, isComplete);
