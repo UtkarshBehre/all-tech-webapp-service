@@ -58,7 +58,7 @@ namespace all_tech_webapp_service.Providers
             return userCreateRequest;
         }
 
-        public bool ValidateToken()
+        public void ValidateToken()
         {
 /*            if (_env.IsDevelopment())
             {
@@ -84,7 +84,6 @@ namespace all_tech_webapp_service.Providers
                 var message = $"Invalid audience: {aud}";
                 throw new SecurityTokenInvalidAudienceException(message);
             }
-            return true;
         }
     }
 }

@@ -8,7 +8,7 @@ namespace all_tech_webapp_service.Providers
 
         UserCreateRequest GetUserCreateRequestFromToken();
 
-        bool ValidateToken();
+        void ValidateToken();
 
         void SetToken(string token);
     }

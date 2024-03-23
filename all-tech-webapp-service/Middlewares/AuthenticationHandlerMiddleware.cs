@@ -20,6 +20,13 @@ namespace all_tech_webapp_service.Middlewares
         public async Task InvokeAsync(HttpContext context)
         {
             var token = context.Request.Headers["Authorization"].FirstOrDefault();
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                _telemetryClient.TrackTrace("Token is missing");
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                return;
+            }
+
             _telemetryClient.TrackTrace($"Token: {token}");
             _tokenHandleProvider.SetToken(token);
             _tokenHandleProvider.ValidateToken();
