@@ -36,6 +36,13 @@ namespace all_tech_webapp_service.Services.Todo.Group
             return todoGroupResponse;
         }
 
+        public async Task<List<TodoGroupResponse>> GetTodoGroups(List<Guid> ids)
+        {
+            var todoGroupRecords = await _todoGroupRepository.GetTodoGroups(ids);
+            var todoGroupResponses = _autoMapperProvider.Mapper.Map<List<TodoGroupResponse>>(todoGroupRecords);
+            return todoGroupResponses;
+        }
+
         public async Task<TodoGroupResponse> UpdateTodoGroup(Guid id, TodoGroupUpdateRequest todoGroupUpdateRequest)
         {
             var todoGroupRecord = await _todoGroupRepository.GetTodoGroup(id);

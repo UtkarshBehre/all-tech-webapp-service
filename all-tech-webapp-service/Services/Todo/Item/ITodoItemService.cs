@@ -15,7 +15,14 @@ namespace all_tech_webapp_service.Services.Todo.Item
         /// Gets all TodoItems
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<TodoItemResponse>> GetAllTodoItems();
+        Task<IEnumerable<TodoItemResponse>> GetAllTodoItemsByUser(Guid userId);
+
+        /// <summary>
+        /// Gets all TodoItems by Group Id
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<TodoItemResponse>> GetAllTodoItemsByGroupId(Guid groupId);
 
         /// <summary>
         /// Gets all TodoItems by Group Id

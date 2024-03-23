@@ -19,6 +19,13 @@ namespace all_tech_webapp_service.Repositories.Todo.TodoGroupRepository
         Task<TodoGroupRecord> GetTodoGroup(Guid id);
 
         /// <summary>
+        /// Gets a To Do Groups by Ids
+        /// </summary>
+        /// <param name="ids">To Do Group Ids</param>
+        /// <returns></returns>
+        Task<List<TodoGroupRecord>> GetTodoGroups(List<Guid> ids);
+
+        /// <summary>
         /// Updates a To Do Group
         /// </summary>
         /// <param name="todoGroupRecord">To Do Group Record</param>

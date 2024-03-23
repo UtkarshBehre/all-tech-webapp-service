@@ -8,11 +8,11 @@ namespace all_tech_webapp_service.Providers
     public class TokenHandlerProvider : ITokenHandlerProvider
     {
         private readonly IWebHostEnvironment _env;
+        private readonly JwtSecurityTokenHandler _handler;
         private readonly string _aud;
         private readonly string _iss;
 
         private JwtSecurityToken _jwtToken;
-        private JwtSecurityTokenHandler _handler;
 
         public TokenHandlerProvider(IWebHostEnvironment env, ConfigurationManager configuration)
         {

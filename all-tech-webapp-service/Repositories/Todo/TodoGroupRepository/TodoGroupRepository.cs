@@ -2,6 +2,7 @@
 using all_tech_webapp_service.Models.Todo;
 using all_tech_webapp_service.Models.Todo.Group;
 using all_tech_webapp_service.Models.Todo.Item;
+using System.Linq.Expressions;
 
 namespace all_tech_webapp_service.Repositories.Todo.TodoGroupRepository
 {
@@ -27,6 +28,16 @@ namespace all_tech_webapp_service.Repositories.Todo.TodoGroupRepository
                 throw new FileNotFoundException($"No Todo Group Record Found with the given Id: {id}");
             }
             return todoGroupRecord;
+        }
+
+        public async Task<List<TodoGroupRecord>> GetTodoGroups(List<Guid> ids)
+        {
+            Expression<Func<TodoGroupRecord, bool>> predicate = x
+                => x.RecordType == RecordType.TodoGroup &&
+                   ids.Contains(x.Id) &&
+                   !x.IsDeleted;
+
+            return await _cosmosDbConnector.ReadItemsAsync(RecordType.TodoGroup, predicate);
         }
 
         public async Task<TodoGroupRecord> UpdateTodoGroup(TodoGroupRecord todoGroupRecord)

@@ -25,16 +25,40 @@ namespace all_tech_webapp_service.Repositories.Todo.TodoItem
             return await _cosmosDbConnector.CreateItemAsync(todoItemRecord, todoItemRecord.RecordType);
         }
 
-        /// <summary>
-        /// Gets all To Do Items
-        /// </summary>
-        /// <returns></returns>
         public async Task<List<TodoItemRecord>> GetAllTodoItems()
         {
             Expression<Func<TodoItemRecord, bool>> predicate = x 
                 => x.RecordType == RecordType.TodoItem &&
                    !x.IsDeleted;
                                                                                             ;
+            var allTodoItems = await _cosmosDbConnector.ReadItemsAsync<TodoItemRecord>(RecordType.TodoItem, predicate);
+            return allTodoItems;
+        }
+
+        public async Task<List<TodoItemRecord>> GetAllTodoItems(Expression<Func<TodoItemRecord, bool>> predicate)
+        {
+            var allTodoItems = await _cosmosDbConnector.ReadItemsAsync<TodoItemRecord>(RecordType.TodoItem, predicate);
+            return allTodoItems;
+        }
+
+        public async Task<List<TodoItemRecord>> GetAllTodoItemsByGroupIds(List<Guid> groupIds)
+        {
+            Expression<Func<TodoItemRecord, bool>> predicate = x
+                => x.RecordType == RecordType.TodoItem &&
+                   groupIds.Contains(x.GroupId) &&
+                   !x.IsDeleted;
+
+            var allTodoItems = await _cosmosDbConnector.ReadItemsAsync<TodoItemRecord>(RecordType.TodoItem, predicate);
+            return allTodoItems;
+        }
+
+        public async Task<List<TodoItemRecord>> GetAllTodoItemByGroupId(Guid groupId)
+        {
+            Expression<Func<TodoItemRecord, bool>> predicate = x
+                => x.RecordType == RecordType.TodoItem &&
+                   x.GroupId == groupId &&
+                   !x.IsDeleted;
+
             var allTodoItems = await _cosmosDbConnector.ReadItemsAsync<TodoItemRecord>(RecordType.TodoItem, predicate);
             return allTodoItems;
         }

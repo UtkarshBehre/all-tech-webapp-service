@@ -21,10 +21,10 @@ namespace all_tech_webapp_service.Controllers.Todo
         }
         
         [HttpGet]
-        [Route("all")]
-        public async Task<IActionResult> GetAllTodoItems()
+        [Route("all/{userId:guid}")]
+        public async Task<IActionResult> GetAllTodoItems([FromRoute] Guid userId)
         {
-            var todoItemResponses = await _todoItemService.GetAllTodoItems();
+            var todoItemResponses = await _todoItemService.GetAllTodoItemsByUser(userId);
             return Ok(todoItemResponses);
         }
 

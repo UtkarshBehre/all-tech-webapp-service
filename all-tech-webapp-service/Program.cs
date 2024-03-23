@@ -8,6 +8,7 @@ using all_tech_webapp_service.Repositories.Todo.TodoItem;
 using all_tech_webapp_service.Repositories.Todo.UserTodo;
 using all_tech_webapp_service.Repositories.User;
 using all_tech_webapp_service.Services;
+using all_tech_webapp_service.Services.Todo.DashBoard;
 using all_tech_webapp_service.Services.Todo.Group;
 using all_tech_webapp_service.Services.Todo.Item;
 using all_tech_webapp_service.Services.Todo.UserTodo;
@@ -78,6 +79,7 @@ namespace all_tech_webapp_service
             builder.Services.AddScoped<ITodoGroupService, TodoGroupService>();
             builder.Services.AddScoped<IUserTodoService, UserTodoService>();
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IDashboardService, DashboardService>();
         }
     }
 }

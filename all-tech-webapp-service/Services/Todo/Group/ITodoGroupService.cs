@@ -19,6 +19,13 @@ namespace all_tech_webapp_service.Services.Todo.Group
         Task<TodoGroupResponse> GetTodoGroup(Guid id);
 
         /// <summary>
+        /// Gets all TodoGroups by group Ids
+        /// </summary>
+        /// <param name="ids">List of Group Ids</param>
+        /// <returns></returns>
+        Task<List<TodoGroupResponse>> GetTodoGroups(List<Guid> ids);
+
+        /// <summary>
         /// Updates a TodoGroup
         /// </summary>
         /// <param name="id">todo Group Id</param>

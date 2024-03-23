@@ -1,4 +1,5 @@
 ﻿using all_tech_webapp_service.Models.Todo.Item;
+using System.Linq.Expressions;
 
 namespace all_tech_webapp_service.Repositories.Todo.TodoItem
 {
@@ -18,12 +19,11 @@ namespace all_tech_webapp_service.Repositories.Todo.TodoItem
         Task<List<TodoItemRecord>> GetAllTodoItems();
 
         /// <summary>
-        /// Get all To Do Items by Group Id
+        /// Gets all To Do Items using the predicate
         /// </summary>
-        /// <param name="groupId"></param>
-        /// <param name="isComplete"></param>
+        /// <param name="predicate"></param>
         /// <returns></returns>
-        Task<List<TodoItemRecord>> GetAllTodoItemByGroupId(Guid groupId, bool isComplete);
+        Task<List<TodoItemRecord>> GetAllTodoItems(Expression<Func<TodoItemRecord, bool>> predicate);
 
         /// <summary>
         /// Gets a To Do Item by Id
