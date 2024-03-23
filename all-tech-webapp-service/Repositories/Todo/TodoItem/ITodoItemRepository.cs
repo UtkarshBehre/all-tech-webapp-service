@@ -21,8 +21,9 @@ namespace all_tech_webapp_service.Repositories.Todo.TodoItem
         /// Get all To Do Items by Group Id
         /// </summary>
         /// <param name="groupId"></param>
+        /// <param name="isComplete"></param>
         /// <returns></returns>
-        Task<List<TodoItemRecord>> GetAllTodoItemByGroupId(Guid groupId);
+        Task<List<TodoItemRecord>> GetAllTodoItemByGroupId(Guid groupId, bool isComplete);
 
         /// <summary>
         /// Gets a To Do Item by Id

@@ -21,8 +21,9 @@ namespace all_tech_webapp_service.Services.Todo.Item
         /// Gets all TodoItems by Group Id
         /// </summary>
         /// <param name="groupId"></param>
+        /// <param name="isComplete"></param>
         /// <returns></returns>
-        Task<IEnumerable<TodoItemResponse>> GetAllTodoItemsByGroupId(Guid groupId);
+        Task<IEnumerable<TodoItemResponse>> GetAllTodoItemsByGroupId(Guid groupId, bool isComplete);
 
         /// <summary>
         /// Gets a TodoItem by Id

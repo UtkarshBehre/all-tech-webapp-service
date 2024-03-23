@@ -30,9 +30,9 @@ namespace all_tech_webapp_service.Services.Todo.Item
             return todoItemResponses;
         }
 
-        public async Task<IEnumerable<TodoItemResponse>> GetAllTodoItemsByGroupId(Guid groupId)
+        public async Task<IEnumerable<TodoItemResponse>> GetAllTodoItemsByGroupId(Guid groupId, bool isComplete)
         {
-            var todoItemRecords = await _todoItemRepository.GetAllTodoItemByGroupId(groupId);
+            var todoItemRecords = await _todoItemRepository.GetAllTodoItemByGroupId(groupId, isComplete);
             var todoItemResponses = _autoMapperProvider.Mapper.Map<IEnumerable<TodoItemResponse>>(todoItemRecords);
             return todoItemResponses;
         }

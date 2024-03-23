@@ -39,11 +39,12 @@ namespace all_tech_webapp_service.Repositories.Todo.TodoItem
             return allTodoItems;
         }
 
-        public async Task<List<TodoItemRecord>> GetAllTodoItemByGroupId(Guid groupId)
+        public async Task<List<TodoItemRecord>> GetAllTodoItemByGroupId(Guid groupId, bool isComplete)
         {
             Expression<Func<TodoItemRecord, bool>> predicate = x
                 => x.RecordType == RecordType.TodoItem &&
                    x.GroupId == groupId &&
+                   x.IsComplete == isComplete &&
                    !x.IsDeleted;
 
             var allTodoItems = await _cosmosDbConnector.ReadItemsAsync<TodoItemRecord>(RecordType.TodoItem, predicate);

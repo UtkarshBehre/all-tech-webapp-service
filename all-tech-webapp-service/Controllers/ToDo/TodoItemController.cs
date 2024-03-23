@@ -29,10 +29,10 @@ namespace all_tech_webapp_service.Controllers.Todo
         }
 
         [HttpGet]
-        [Route("all/{groupId:guid}")]
-        public async Task<IActionResult> GetAllTodoItemsByGroupId([FromRoute] Guid groupId)
+        [Route("all/{groupId:guid}/{isComplete:bool}")]
+        public async Task<IActionResult> GetAllTodoItemsByGroupId([FromRoute] Guid groupId, [FromRoute] bool isComplete)
         {
-            var todoItemResponses = await _todoItemService.GetAllTodoItemsByGroupId(groupId);
+            var todoItemResponses = await _todoItemService.GetAllTodoItemsByGroupId(groupId, isComplete);
             return Ok(todoItemResponses);
         }
 
