@@ -10,12 +10,12 @@ namespace all_tech_webapp_service.Models.Todo
         public IEnumerable<TodoItemResponse> TodoItems { get; set; }
 
         [JsonProperty("groupsMap")]
-        public Dictionary<string, TodoGroupResponse> GroupsMap { get; set; }
+        public IEnumerable<TodoGroupResponse> GroupsMap { get; set; }
 
         public AllItemsResponse()
         {
             TodoItems = new List<TodoItemResponse>();
-            GroupsMap = new Dictionary<string, TodoGroupResponse>();
+            GroupsMap = new List<TodoGroupResponse>();
         }
     }
 }
