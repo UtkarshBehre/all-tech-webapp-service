@@ -9,7 +9,7 @@ namespace all_tech_webapp_service.Services.User
         /// </summary>
         /// <param name="userCreateRequest">User  Create Request</param>
         /// <returns></returns>
-        Task<UserResponse> CreateUser(UserCreateRequest userCreateRequest);
+        Task<UserResponse> CreateUser();
 
         /// <summary>
         /// Gets all Users

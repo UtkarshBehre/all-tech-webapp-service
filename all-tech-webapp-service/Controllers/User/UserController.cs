@@ -36,8 +36,7 @@ namespace all_tech_webapp_service.Controllers.User
         [Route("create")]
         public async Task<IActionResult> CreateUser()
         {
-            var userCreateRequest = _tokenHandlerProvider.GetUserCreateRequestFromToken();
-            var userResponse = await _userService.CreateUser(userCreateRequest);
+            var userResponse = await _userService.CreateUser();
             return Ok(userResponse);
         }
 

@@ -1,7 +1,14 @@
-﻿using all_tech_webapp_service.Models.User;
+﻿using all_tech_webapp_service.Models.Todo.Group;
+using all_tech_webapp_service.Models.Todo.Item;
+using all_tech_webapp_service.Models.Todo.UserTodo;
+using all_tech_webapp_service.Models.User;
 using all_tech_webapp_service.Providers;
 using all_tech_webapp_service.Repositories.User;
-using Microsoft.Azure.Cosmos;
+using all_tech_webapp_service.Services.Todo.Group;
+using all_tech_webapp_service.Services.Todo.Item;
+using all_tech_webapp_service.Services.Todo.UserTodo;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 using UserResponse = all_tech_webapp_service.Models.User.UserResponse;
 
 namespace all_tech_webapp_service.Services.User
@@ -9,26 +16,58 @@ namespace all_tech_webapp_service.Services.User
     public class UserService : IUserService
     {
         private readonly IUserRepository _UserRepository;
+        private readonly ITodoGroupService _todoGroupService;
+        private readonly IUserTodoService _userTodoService;
+        private readonly ITodoItemService _todoItemService;
         private readonly IAutoMapperProvider _autoMapperProvider;
         private readonly ITokenHandlerProvider _tokenHandlerProvider;
+        private readonly TelemetryClient _telemetryClient;
 
         /// <summary>
         /// Contrustor for UserService
         /// </summary>
         /// <param name="userRepository"></param>
+        /// <param name="todoGroupService"></param>
+        /// <param name="tokenHandlerProvider"></param>
+        /// <param name="userTodoService"></param>
+        /// <param name="telemetryClient"></param>
         /// <param name="autoMapperProvider"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public UserService(IUserRepository userRepository, ITokenHandlerProvider tokenHandlerProvider, IAutoMapperProvider autoMapperProvider)
+        public UserService(IUserRepository userRepository, ITodoGroupService todoGroupService, IUserTodoService userTodoService, ITodoItemService todoItemService, ITokenHandlerProvider tokenHandlerProvider, IAutoMapperProvider autoMapperProvider, TelemetryClient telemetryClient)
         {
             _UserRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+            _todoGroupService = todoGroupService ?? throw new ArgumentNullException(nameof(todoGroupService));
+            _userTodoService = userTodoService ?? throw new ArgumentNullException(nameof(userTodoService));
+            _todoItemService = todoItemService ?? throw new ArgumentNullException(nameof(todoItemService));
             _tokenHandlerProvider = tokenHandlerProvider ?? throw new ArgumentNullException(nameof(tokenHandlerProvider));
             _autoMapperProvider = autoMapperProvider ?? throw new ArgumentNullException(nameof(autoMapperProvider));
+            _telemetryClient = telemetryClient ?? throw new ArgumentNullException(nameof(telemetryClient));
         }
 
-        public async Task<UserResponse> CreateUser(UserCreateRequest userCreateRequest)
+        public async Task<UserResponse> CreateUser()
         {
+            var userCreateRequest = _tokenHandlerProvider.GetUserCreateRequestFromToken();
             var userRecord = _autoMapperProvider.Mapper.Map<UserRecord>(userCreateRequest);
+            
             userRecord = await _UserRepository.CreateUser(userRecord);
+
+            var todoGroup = await _todoGroupService.CreateTodoGroup(new TodoGroupCreateRequest
+            {
+                Name = "Default",
+            });
+
+            await _userTodoService.CreateUserTodo(new UserTodoCreateRequest
+            {
+                Id = userRecord.Id,
+                GroupIds = new List<Guid> { todoGroup.Id }
+            });
+
+            await _todoItemService.CreateTodoItem(new TodoItemCreateRequest
+            {
+                GroupId = todoGroup.Id,
+                Title = "Start Creating some todo tasks",
+            });
+
             var userResponse = _autoMapperProvider.Mapper.Map<UserResponse>(userRecord);
             return userResponse;
         }
@@ -49,20 +88,23 @@ namespace all_tech_webapp_service.Services.User
 
         public async Task<UserResponse> GetUserByGoogleId(string googleId)
         {
-            UserRecord userRecord;
+            UserResponse userResponse = null;
                 
             try
             {
-                userRecord = await _UserRepository.GetUserByGoogleId(googleId);
+                var userRecord = await _UserRepository.GetUserByGoogleId(googleId);
+                userResponse = _autoMapperProvider.Mapper.Map<UserResponse>(userRecord);
             }
             catch (FileNotFoundException)
             {
-                var userCreateRequest = _tokenHandlerProvider.GetUserCreateRequestFromToken();
-                userRecord = _autoMapperProvider.Mapper.Map<UserRecord>(userCreateRequest);
-                userRecord = await _UserRepository.CreateUser(userRecord);
+                _telemetryClient.TrackTrace($"User not found with google Id: {googleId}. Hence creating a new one", SeverityLevel.Information);
             }
             
-            var userResponse = _autoMapperProvider.Mapper.Map<UserResponse>(userRecord);
+            if (userResponse == null)
+            {
+                userResponse = await CreateUser();
+            }
+
             return userResponse;
         }
 
