@@ -9,13 +9,13 @@ namespace all_tech_webapp_service.Models.Todo
         [JsonProperty("todoItems")]
         public IEnumerable<TodoItemResponse> TodoItems { get; set; }
 
-        [JsonProperty("groupsMap")]
-        public IEnumerable<TodoGroupResponse> GroupsMap { get; set; }
+        [JsonProperty("todoGroups")]
+        public IEnumerable<TodoGroupResponse> TodoGroups { get; set; }
 
         public AllItemsResponse()
         {
             TodoItems = new List<TodoItemResponse>();
-            GroupsMap = new List<TodoGroupResponse>();
+            TodoGroups = new List<TodoGroupResponse>();
         }
     }
 }

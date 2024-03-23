@@ -27,7 +27,7 @@ namespace all_tech_webapp_service.Services.Todo.DashBoard
             var allItemsResponse = new AllItemsResponse
             {
                 TodoItems = todoItems,
-                GroupsMap = todoGroups
+                TodoGroups = todoGroups
             };
 
             return allItemsResponse;
