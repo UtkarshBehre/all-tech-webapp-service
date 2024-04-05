@@ -26,6 +26,7 @@ namespace all_tech_webapp_service.Providers
             await Groups.AddToGroupAsync(Context.ConnectionId, chatDetails.ChatRoom);
 
             connectionIdTochatDetails[Context.ConnectionId] = chatDetails;
+            connectionIdTochatDetails.AddOrUpdate(Context.ConnectionId, chatDetails, (key, value) => chatDetails);
             _telemetryClient.TrackTrace($"ConnectionId: {Context.ConnectionId} User {chatDetails.UserName} has joined {chatDetails.ChatRoom}");
             await Clients.Group(chatDetails.ChatRoom)
                 .SendAsync("ReceiveSpecificMessage", "admin", $"{chatDetails.UserName} has joined {chatDetails.ChatRoom}.");
@@ -41,7 +42,7 @@ namespace all_tech_webapp_service.Providers
             }
             else
             {
-                _telemetryClient.TrackTrace($"ConnectionId not found in map");
+                _telemetryClient.TrackTrace($"ConnectionId {Context.ConnectionId} not found in map");
                 await Clients.Group("1")
                     .SendAsync("ReceiveSpecificMessage", "someone", message);
             }
