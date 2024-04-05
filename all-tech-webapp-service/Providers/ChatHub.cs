@@ -35,6 +35,11 @@ namespace all_tech_webapp_service.Providers
                 await Clients.Group(chatDetails.ChatRoom)
                     .SendAsync("ReceiveSpecificMessage", chatDetails.UserName, message);
             }
+            else
+            {
+                await Clients.Group("1")
+                    .SendAsync("ReceiveSpecificMessage", "someone", message);
+            }
         }
     }
 }
