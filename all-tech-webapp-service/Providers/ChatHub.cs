@@ -1,15 +1,16 @@
 ﻿using all_tech_webapp_service.Models.Chat;
 using Microsoft.AspNetCore.SignalR;
+using System.Collections.Concurrent;
 
 namespace all_tech_webapp_service.Providers
 {
     public class ChatHub : Hub
     {
-        public Dictionary<string, ChatDetails> connectionIdTochatDetails;
+        public ConcurrentDictionary<string, ChatDetails> connectionIdTochatDetails;
 
         public ChatHub()
         {
-            connectionIdTochatDetails = new Dictionary<string, ChatDetails>();
+            connectionIdTochatDetails = new ConcurrentDictionary<string, ChatDetails>();
         }
 
         public async Task JoinChat(ChatDetails chatDetails)
@@ -21,7 +22,7 @@ namespace all_tech_webapp_service.Providers
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, chatDetails.ChatRoom);
 
-            connectionIdTochatDetails.Add(Context.ConnectionId, chatDetails);
+            connectionIdTochatDetails[Context.ConnectionId] = chatDetails;
 
             await Clients.Group(chatDetails.ChatRoom)
                 .SendAsync("ReceiveSpecificMessage", "admin", $"{chatDetails.UserName} has joined {chatDetails.ChatRoom}.");
