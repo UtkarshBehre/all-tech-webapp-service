@@ -29,7 +29,18 @@ namespace all_tech_webapp_service
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            
+
+            builder.Services.AddCors(opt =>
+            {
+                opt.AddPolicy("AllTechApp", builder =>
+                {
+                    builder.WithOrigins("http://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
+            });
+
             // SETUP APP INSIGHTS
             var asConnectionString = ConfigurationManager.AppSettings[Constants.APPLICATIONINSIGHTS_CONNECTION_STRING] ?? string.Empty;
             builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions { ConnectionString = asConnectionString });
@@ -63,6 +74,8 @@ namespace all_tech_webapp_service
             app.MapControllers();
 
             app.MapHub<ChatHub>("/Chat");
+
+            app.UseCors("AllTechApp");
 
             app.Run();
         }

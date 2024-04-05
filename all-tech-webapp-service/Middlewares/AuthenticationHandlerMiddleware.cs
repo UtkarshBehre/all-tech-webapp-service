@@ -19,6 +19,12 @@ namespace all_tech_webapp_service.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
+            var pathsToSkip = new List<string> { "/health/ping", "/chat" };
+            if (pathsToSkip.Contains(context.Request.Path.Value, StringComparer.OrdinalIgnoreCase))
+            {
+                await _next.Invoke(context);
+                return;
+            }
             var token = context.Request.Headers["Authorization"].FirstOrDefault();
             if (string.IsNullOrWhiteSpace(token))
             {
