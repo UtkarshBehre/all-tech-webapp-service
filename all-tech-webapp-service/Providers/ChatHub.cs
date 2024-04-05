@@ -1,4 +1,5 @@
 ﻿using all_tech_webapp_service.Models.Chat;
+using all_tech_webapp_service.Repositories;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Concurrent;
@@ -8,11 +9,11 @@ namespace all_tech_webapp_service.Providers
     public class ChatHub : Hub
     {
         private readonly TelemetryClient _telemetryClient;
-        public ConcurrentDictionary<string, ChatDetails> connectionIdTochatDetails;
+
+        public static ConcurrentDictionary<string, ChatDetails> connectionIdTochatDetails = new ConcurrentDictionary<string, ChatDetails>();
 
         public ChatHub(TelemetryClient telemetryClient)
         {
-            connectionIdTochatDetails = new ConcurrentDictionary<string, ChatDetails>();
             _telemetryClient = telemetryClient;
         }
 
