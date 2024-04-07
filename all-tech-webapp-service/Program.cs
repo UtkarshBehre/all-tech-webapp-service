@@ -63,6 +63,8 @@ namespace all_tech_webapp_service
             var app = builder.Build();
 
             // SETUP SWAGGER FOR ALL ENVIRONMENTS
+            app.UseCors("AllTechApp");
+
             app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseSwagger();
             app.UseSwaggerUI();
@@ -78,7 +80,6 @@ namespace all_tech_webapp_service
             app.MapHub<TodoHub>(Constants.TodoHubPath);
             app.MapHub<ChatHub>(Constants.ChatHubPath);
 
-            app.UseCors("AllTechApp");
 
             app.Run();
         }
