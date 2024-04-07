@@ -14,5 +14,8 @@
         public const string ISSUER = "Token:Issuer";
         public const string AUDIENCE = "Token:Audience";
         public const string APPLICATIONINSIGHTS_CONNECTION_STRING = "APPLICATIONINSIGHTS_CONNECTION_STRING";
+
+        public const string TodoHubPath = "/Todo";
+        public const string ChatHubPath = "/Chat";
     }
 }

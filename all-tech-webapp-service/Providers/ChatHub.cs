@@ -6,8 +6,8 @@ using System.Collections.Concurrent;
 
 namespace all_tech_webapp_service.Providers
 {
-    public class ChatHub
-    {/*
+    public class ChatHub: Hub
+    {
         private readonly TelemetryClient _telemetryClient;
 
         public static ConcurrentDictionary<string, ChatDetails> connectionIdTochatDetails = new ConcurrentDictionary<string, ChatDetails>();
@@ -19,7 +19,7 @@ namespace all_tech_webapp_service.Providers
 
         public async Task JoinChat(ChatDetails chatDetails)
         {
-            await Clients.All.SendAsync("ReceiveMessage", "admin", $"{chatDetails.UserName} has joined." );
+            await Clients.All.SendAsync("ReceiveMessage", "admin", $"{chatDetails.UserName} has joined.");
         }
 
         public async Task JoinSpecificChatRoom(ChatDetails chatDetails)
@@ -47,6 +47,6 @@ namespace all_tech_webapp_service.Providers
                 await Clients.Group("1")
                     .SendAsync("ReceiveSpecificMessage", "someone", message);
             }
-        }*/
+        }
     }
 }

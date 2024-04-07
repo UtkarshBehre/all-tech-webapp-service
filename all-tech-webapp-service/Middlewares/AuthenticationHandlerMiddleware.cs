@@ -1,5 +1,7 @@
 ﻿
+using all_tech_webapp_service.Properties;
 using all_tech_webapp_service.Providers;
+using all_tech_webapp_service.Providers.Todo;
 using Microsoft.ApplicationInsights;
 
 namespace all_tech_webapp_service.Middlewares
@@ -19,7 +21,7 @@ namespace all_tech_webapp_service.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-            var pathsToSkip = new List<string> { "/health/ping", "/hub" };
+            var pathsToSkip = new List<string> { "/health/ping", Constants.TodoHubPath, Constants.ChatHubPath };
             if (pathsToSkip.Contains(context.Request.Path.Value, StringComparer.OrdinalIgnoreCase))
             {
                 await _next.Invoke(context);
