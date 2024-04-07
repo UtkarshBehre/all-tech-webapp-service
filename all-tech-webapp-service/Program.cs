@@ -75,7 +75,7 @@ namespace all_tech_webapp_service
 
             app.MapControllers();
 
-            app.MapHub<Hub>("/hub");
+            app.MapHub<TodoHub>("/hub");
 
             app.UseCors("AllTechApp");
 

@@ -7,7 +7,7 @@ using System.Collections.Concurrent;
 namespace all_tech_webapp_service.Providers
 {
     public class ChatHub : Hub
-    {
+    {/*
         private readonly TelemetryClient _telemetryClient;
 
         public static ConcurrentDictionary<string, ChatDetails> connectionIdTochatDetails = new ConcurrentDictionary<string, ChatDetails>();
@@ -47,6 +47,6 @@ namespace all_tech_webapp_service.Providers
                 await Clients.Group("1")
                     .SendAsync("ReceiveSpecificMessage", "someone", message);
             }
-        }
+        }*/
     }
 }
