@@ -19,7 +19,7 @@ namespace all_tech_webapp_service.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-            var pathsToSkip = new List<string> { "/health/ping", "/chatHub" };
+            var pathsToSkip = new List<string> { "/health/ping", "/hub" };
             if (pathsToSkip.Contains(context.Request.Path.Value, StringComparer.OrdinalIgnoreCase))
             {
                 await _next.Invoke(context);
