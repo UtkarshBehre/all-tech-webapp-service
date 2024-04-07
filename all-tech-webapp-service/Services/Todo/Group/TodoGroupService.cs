@@ -1,6 +1,7 @@
 ﻿using all_tech_webapp_service.Models.Todo.Group;
 using all_tech_webapp_service.Models.Todo.UserTodo;
 using all_tech_webapp_service.Providers;
+using all_tech_webapp_service.Providers.Todo;
 using all_tech_webapp_service.Repositories.Todo.TodoGroupRepository;
 using all_tech_webapp_service.Services.Todo.UserTodo;
 using all_tech_webapp_service.Services.User;
@@ -12,6 +13,8 @@ namespace all_tech_webapp_service.Services.Todo.Group
         private readonly ITodoGroupRepository _todoGroupRepository;
         private readonly IUserService _userService;
         private readonly IUserTodoService _userTodoService;
+        private readonly ITokenHandlerProvider _tokenHandlerProvider;
+        private readonly ITodoGroupHub _todoGroupHub;
         private readonly IAutoMapperProvider _autoMapperProvider;
 
         /// <summary>
@@ -20,11 +23,13 @@ namespace all_tech_webapp_service.Services.Todo.Group
         /// <param name="todoGroupRepository"></param>
         /// <param name="autoMapperProvider"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public TodoGroupService(ITodoGroupRepository todoGroupRepository, IUserService userService, IUserTodoService userTodoService, IAutoMapperProvider autoMapperProvider)
+        public TodoGroupService(ITodoGroupRepository todoGroupRepository, IUserService userService, IUserTodoService userTodoService, ITokenHandlerProvider tokenHandlerProvider, ITodoGroupHub todoGroupHub, IAutoMapperProvider autoMapperProvider)
         {
             _todoGroupRepository = todoGroupRepository ?? throw new ArgumentNullException(nameof(todoGroupRepository));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _userTodoService = userTodoService ?? throw new ArgumentNullException(nameof(userTodoService));
+            _tokenHandlerProvider = tokenHandlerProvider ?? throw new ArgumentNullException(nameof(tokenHandlerProvider));
+            _todoGroupHub = todoGroupHub ?? throw new ArgumentNullException(nameof(todoGroupHub));
             _autoMapperProvider = autoMapperProvider ?? throw new ArgumentNullException(nameof(autoMapperProvider));
         }
 
@@ -70,8 +75,10 @@ namespace all_tech_webapp_service.Services.Todo.Group
             
             await _userTodoService.UpdateUserTodo(userTodo.Id, userTodoRequest);
 
-            // signal the group
-            // send this signal to room with userid
+            var googleId = _tokenHandlerProvider.GetSubFromToken();
+            var currentUser = await _userService.GetUserByGoogleId(googleId);
+            var todoGroup = await GetTodoGroup(Groupid);
+            await _todoGroupHub.SendTodoGroupSharedMessage($"{currentUser.FirstName} {currentUser.LastName}", todoGroup.Name, user.Id.ToString());
         }
 
         public async Task<bool> DeleteTodoGroup(Guid id)

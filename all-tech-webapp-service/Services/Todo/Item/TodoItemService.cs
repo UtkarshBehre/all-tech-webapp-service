@@ -98,8 +98,6 @@ namespace all_tech_webapp_service.Services.Todo.Item
             todoItemRecord = await _todoItemRepository.UpdateTodoItem(todoItemRecord);
             var todoItemResponse = _autoMapperProvider.Mapper.Map<TodoItemResponse>(todoItemRecord);
 
-            // send signal to room groupId to all users other than this one
-
             return todoItemResponse;
         }
 
