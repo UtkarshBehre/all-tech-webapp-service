@@ -6,7 +6,7 @@ using System.Collections.Concurrent;
 
 namespace all_tech_webapp_service.Providers
 {
-    public class ChatHub : Hub
+    public class ChatHub
     {/*
         private readonly TelemetryClient _telemetryClient;
 

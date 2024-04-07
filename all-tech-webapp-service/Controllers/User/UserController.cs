@@ -33,7 +33,7 @@ namespace all_tech_webapp_service.Controllers.User
         }
 
         [HttpGet]
-        [Route("email/{emailId:string}")]
+        [Route("email/{emailId}")]
         public async Task<IActionResult> GetUserByEmailId([FromRoute] string emailId)
         {
             var userResponse = await _userService.GetUserByEmailId(emailId);
