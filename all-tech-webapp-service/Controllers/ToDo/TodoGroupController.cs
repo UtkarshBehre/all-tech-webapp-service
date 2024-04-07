@@ -42,6 +42,15 @@ namespace all_tech_webapp_service.Controllers.ToDo
             return Ok(todoGroupResponse);
         }
 
+        [HttpPut]
+        [Route("share/id={id:guid}/email={email:string}")]
+        public async Task<IActionResult> ShareTodoGroup([FromRoute] Guid id, [FromRoute] string email)
+        {
+            // TODO: validate email
+            await _todoGroupService.ShareTodoGroup(id, email);
+            return Ok();
+        }
+
         [HttpDelete]
         [Route("delete/{id}")]
         public async Task<IActionResult> DeleteTodoGroup([FromRoute] Guid id)

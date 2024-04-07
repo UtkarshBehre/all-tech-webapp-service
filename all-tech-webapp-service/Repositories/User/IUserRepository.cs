@@ -25,6 +25,13 @@ namespace all_tech_webapp_service.Repositories.User
         Task<UserRecord> GetUser(Guid id);
 
         /// <summary>
+        /// Gets a User by Email Id
+        /// </summary>
+        /// <param name="email">emailId</param>
+        /// <returns></returns>
+        Task<UserRecord> GetUserByEmailId(string email);
+
+        /// <summary>
         /// Gets a User by Google Id
         /// </summary>
         /// <param name="googleId">Google Id</param>

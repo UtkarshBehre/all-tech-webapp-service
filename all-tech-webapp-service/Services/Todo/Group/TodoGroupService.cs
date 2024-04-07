@@ -1,12 +1,17 @@
 ﻿using all_tech_webapp_service.Models.Todo.Group;
+using all_tech_webapp_service.Models.Todo.UserTodo;
 using all_tech_webapp_service.Providers;
 using all_tech_webapp_service.Repositories.Todo.TodoGroupRepository;
+using all_tech_webapp_service.Services.Todo.UserTodo;
+using all_tech_webapp_service.Services.User;
 
 namespace all_tech_webapp_service.Services.Todo.Group
 {
     public class TodoGroupService : ITodoGroupService
     {
         private readonly ITodoGroupRepository _todoGroupRepository;
+        private readonly IUserService _userService;
+        private readonly IUserTodoService _userTodoService;
         private readonly IAutoMapperProvider _autoMapperProvider;
 
         /// <summary>
@@ -15,9 +20,11 @@ namespace all_tech_webapp_service.Services.Todo.Group
         /// <param name="todoGroupRepository"></param>
         /// <param name="autoMapperProvider"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public TodoGroupService(ITodoGroupRepository todoGroupRepository, IAutoMapperProvider autoMapperProvider)
+        public TodoGroupService(ITodoGroupRepository todoGroupRepository, IUserService userService, IUserTodoService userTodoService, IAutoMapperProvider autoMapperProvider)
         {
             _todoGroupRepository = todoGroupRepository ?? throw new ArgumentNullException(nameof(todoGroupRepository));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _userTodoService = userTodoService ?? throw new ArgumentNullException(nameof(userTodoService));
             _autoMapperProvider = autoMapperProvider ?? throw new ArgumentNullException(nameof(autoMapperProvider));
         }
 
@@ -51,6 +58,20 @@ namespace all_tech_webapp_service.Services.Todo.Group
             todoGroupRecord = await _todoGroupRepository.UpdateTodoGroup(todoGroupRecord);
             var todoGroupResponse = _autoMapperProvider.Mapper.Map<TodoGroupResponse>(todoGroupRecord);
             return todoGroupResponse;
+        }
+
+        public async Task ShareTodoGroup(Guid Groupid, string email)
+        {
+            var user = await _userService.GetUserByEmailId(email);
+            
+            var userTodo = await _userTodoService.GetUserTodo(user.Id);
+            userTodo.GroupIds.Add(Groupid);
+            var userTodoRequest = _autoMapperProvider.Mapper.Map<UserTodoUpdateRequest>(userTodo);
+            
+            await _userTodoService.UpdateUserTodo(userTodo.Id, userTodoRequest);
+
+            // signal the group
+            // send this signal to room with userid
         }
 
         public async Task<bool> DeleteTodoGroup(Guid id)

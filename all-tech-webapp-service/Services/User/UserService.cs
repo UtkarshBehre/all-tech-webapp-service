@@ -86,6 +86,13 @@ namespace all_tech_webapp_service.Services.User
             return userResponse;
         }
 
+        public async Task<UserResponse> GetUserByEmailId(string email)
+        {
+            var userRecord = await _UserRepository.GetUserByEmailId(email);
+            var userResponse = _autoMapperProvider.Mapper.Map<UserResponse>(userRecord);
+            return userResponse;
+        }
+
         public async Task<UserResponse> GetUserByGoogleId(string googleId)
         {
             UserResponse userResponse = null;

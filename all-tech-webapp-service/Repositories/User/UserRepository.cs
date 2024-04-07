@@ -39,6 +39,21 @@ namespace all_tech_webapp_service.Repositories.User
             return userRecord;
         }
 
+        public async Task<UserRecord> GetUserByEmailId(string email)
+        {
+            Expression<Func<UserRecord, bool>> predicate = x
+                => x.RecordType == RecordType.User &&
+                   x.Email == email &&
+                   !x.IsDeleted;
+            ;
+            var userRecords = await _cosmosDbConnector.ReadItemsAsync<UserRecord>(RecordType.User, predicate);
+            if (userRecords == null || userRecords.Count == 0)
+            {
+                throw new FileNotFoundException($"No User Record Found with the given Email: {email}");
+            }
+            return userRecords.FirstOrDefault();
+        }
+
         public async Task<UserRecord> GetUserByGoogleId(string id)
         {
             Expression<Func<UserRecord, bool>> predicate = x

@@ -34,6 +34,14 @@ namespace all_tech_webapp_service.Services.Todo.Group
         Task<TodoGroupResponse> UpdateTodoGroup(Guid id, TodoGroupUpdateRequest todoGroupUpdateRequest);
 
         /// <summary>
+        /// Share a TodoGroup with a user
+        /// </summary>
+        /// <param name="Groupid">Todo Group Id</param>
+        /// <param name="email">Email</param>
+        /// <returns></returns>
+        Task ShareTodoGroup(Guid Groupid, string email);
+
+        /// <summary>
         /// Deletes a TodoGroup by Id
         /// </summary>
         /// <param name="id">todo Group Id</param>
