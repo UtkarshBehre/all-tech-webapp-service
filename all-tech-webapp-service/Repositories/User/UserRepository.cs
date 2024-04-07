@@ -47,11 +47,12 @@ namespace all_tech_webapp_service.Repositories.User
                    !x.IsDeleted;
             ;
             var userRecords = await _cosmosDbConnector.ReadItemsAsync<UserRecord>(RecordType.User, predicate);
-            if (userRecords == null || userRecords.Count == 0)
+            var userRecord = userRecords?.FirstOrDefault();
+            if (userRecord == null)
             {
                 throw new FileNotFoundException($"No User Record Found with the given Email: {email}");
             }
-            return userRecords.FirstOrDefault();
+            return userRecord;
         }
 
         public async Task<UserRecord> GetUserByGoogleId(string id)
@@ -63,8 +64,8 @@ namespace all_tech_webapp_service.Repositories.User
 
             var userRecords = await _cosmosDbConnector.ReadItemsAsync<UserRecord>(RecordType.User, predicate);
 
-            var userRecord = userRecords.FirstOrDefault();
-            if (userRecord == null || userRecord.IsDeleted)
+            var userRecord = userRecords?.FirstOrDefault();
+            if (userRecord == null)
             {
                 throw new FileNotFoundException($"No User Record Found with the given Id: {id}");
             }
