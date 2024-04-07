@@ -33,7 +33,7 @@ namespace all_tech_webapp_service.Controllers.User
         }
 
         [HttpGet]
-        [Route("/{emailId:string}")]
+        [Route("email/{emailId:string}")]
         public async Task<IActionResult> GetUserByEmailId([FromRoute] string emailId)
         {
             var userResponse = await _userService.GetUserByEmailId(emailId);
@@ -57,7 +57,7 @@ namespace all_tech_webapp_service.Controllers.User
         }
 
         [HttpDelete]
-        [Route("delete/{id}")]
+        [Route("delete/{id:guid}")]
         public async Task<IActionResult> DeleteUser([FromRoute] Guid id)
         {
             var isDeleted = await _userService.DeleteUser(id);
