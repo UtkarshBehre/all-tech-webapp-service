@@ -1,14 +1,13 @@
 ﻿using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.SignalR;
-using System.Text.RegularExpressions;
 
 namespace all_tech_webapp_service.Providers.Todo
 {
-    public class TodoGroupHub : Hub, ITodoGroupHub
+    public class TodoHub : Hub, ITodoHub
     {
         private readonly TelemetryClient _telemetryClient;
 
-        public TodoGroupHub(TelemetryClient telemetryClient) 
+        public TodoHub(TelemetryClient telemetryClient) 
         {
             _telemetryClient = telemetryClient ?? throw new ArgumentNullException(nameof(telemetryClient));
         }

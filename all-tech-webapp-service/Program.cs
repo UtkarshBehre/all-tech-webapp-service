@@ -3,6 +3,7 @@ using all_tech_webapp_service.Middlewares;
 using all_tech_webapp_service.Models.Config;
 using all_tech_webapp_service.Properties;
 using all_tech_webapp_service.Providers;
+using all_tech_webapp_service.Providers.Todo;
 using all_tech_webapp_service.Repositories.Todo.TodoGroupRepository;
 using all_tech_webapp_service.Repositories.Todo.TodoItem;
 using all_tech_webapp_service.Repositories.Todo.UserTodo;
@@ -73,7 +74,8 @@ namespace all_tech_webapp_service
 
             app.MapControllers();
 
-            app.MapHub<ChatHub>("/Chat");
+            app.MapHub<ChatHub>("/chatHub");
+            app.MapHub<TodoHub>("/todoHub");
 
             app.UseCors("AllTechApp");
 
