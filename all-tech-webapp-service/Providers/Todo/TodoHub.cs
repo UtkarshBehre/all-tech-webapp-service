@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace all_tech_webapp_service.Providers.Todo
 {
-    public class TodoHub : Hub, ITodoHub
+    public class TodoHub : Hub
     {
         private readonly TelemetryClient _telemetryClient;
 

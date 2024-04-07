@@ -32,6 +32,14 @@ namespace all_tech_webapp_service.Controllers.User
             return Ok(userResponse);
         }
 
+        [HttpGet]
+        [Route("{emailId:string}")]
+        public async Task<IActionResult> GetUserByEmailId([FromRoute] string emailId)
+        {
+            var userResponse = await _userService.GetUserByEmailId(emailId);
+            return Ok(userResponse);
+        }
+
         [HttpPost]
         [Route("create")]
         public async Task<IActionResult> CreateUser()
