@@ -3,23 +3,20 @@ using all_tech_webapp_service.Models.Todo;
 using all_tech_webapp_service.Models.Todo.Item;
 using all_tech_webapp_service.Providers;
 using all_tech_webapp_service.Repositories.Todo.TodoItem;
-using all_tech_webapp_service.Services.Todo.Group;
-using all_tech_webapp_service.Services.Todo.UserTodo;
+using all_tech_webapp_service.Repositories.Todo.UserTodo;
 
 namespace all_tech_webapp_service.Services.Todo.Item
 {
     public class TodoItemService : ITodoItemService
     {
         private readonly ITodoItemRepository _todoItemRepository;
-        private readonly IUserTodoService _userTodoService;
-        private readonly ITodoGroupService _todoGroupService;
+        private readonly IUserTodoRepository _userTodoRepository;
         private readonly IAutoMapperProvider _autoMapperProvider;
 
-        public TodoItemService(ITodoItemRepository todoItemRepository, IUserTodoService userTodoService, ITodoGroupService todoGroupService, IAutoMapperProvider autoMapperProvider)
+        public TodoItemService(ITodoItemRepository todoItemRepository, IUserTodoRepository userTodoRepository, IAutoMapperProvider autoMapperProvider)
         {
             _todoItemRepository = todoItemRepository ?? throw new ArgumentNullException(nameof(todoItemRepository));
-            _userTodoService = userTodoService ?? throw new ArgumentNullException(nameof(userTodoService));
-            _todoGroupService = todoGroupService ?? throw new ArgumentNullException(nameof(todoGroupService));
+            _userTodoRepository = userTodoRepository ?? throw new ArgumentNullException(nameof(userTodoRepository));
             _autoMapperProvider = autoMapperProvider ?? throw new ArgumentNullException(nameof(autoMapperProvider));
         }
 
@@ -40,7 +37,7 @@ namespace all_tech_webapp_service.Services.Todo.Item
 
         public async Task<IEnumerable<TodoItemResponse>> GetAllTodoItemsByUser(Guid userId)
         {
-            var userTodo = await _userTodoService.GetUserTodo(userId);
+            var userTodo = await _userTodoRepository.GetUserTodo(userId);
             var groupIds = userTodo.GroupIds;
 
             var todoItemResponses = await GetAllTodoItems(groupIds);

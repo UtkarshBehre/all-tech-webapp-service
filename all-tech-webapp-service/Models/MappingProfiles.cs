@@ -29,9 +29,6 @@ namespace all_tech_webapp_service.Models
             CreateMap<UserTodoUpdateRequest, UserTodoRecord>();
             CreateMap<UserTodoRecord, UserTodoResponse>();
 
-            // anti-pattern
-            CreateMap<UserTodoResponse, UserTodoRequest>();
-
             // User
             CreateMap<UserCreateRequest, UserRecord>();
             CreateMap<UserRequest, UserRecord>();

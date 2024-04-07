@@ -1,9 +1,6 @@
 ﻿using all_tech_webapp_service.Models.Todo.Group;
 using all_tech_webapp_service.Services.Todo.Group;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Cosmos;
 
 namespace all_tech_webapp_service.Controllers.ToDo
 {
@@ -43,7 +40,7 @@ namespace all_tech_webapp_service.Controllers.ToDo
         }
 
         [HttpPut]
-        [Route("share/id={id:guid}/email={email:string}")]
+        [Route("share/id={id:guid}/email={email}")]
         public async Task<IActionResult> ShareTodoGroup([FromRoute] Guid id, [FromRoute] string email)
         {
             // TODO: validate email
