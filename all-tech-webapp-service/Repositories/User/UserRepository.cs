@@ -64,8 +64,8 @@ namespace all_tech_webapp_service.Repositories.User
 
             var userRecords = await _cosmosDbConnector.ReadItemsAsync<UserRecord>(RecordType.User, predicate);
 
-            var userRecord = userRecords?.FirstOrDefault();
-            if (userRecord == null)
+            var userRecord = userRecords.FirstOrDefault();
+            if (userRecord == null || userRecord.IsDeleted)
             {
                 throw new FileNotFoundException($"No User Record Found with the given Id: {id}");
             }
