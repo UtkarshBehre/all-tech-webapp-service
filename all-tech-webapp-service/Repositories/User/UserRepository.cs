@@ -43,7 +43,7 @@ namespace all_tech_webapp_service.Repositories.User
         {
             Expression<Func<UserRecord, bool>> predicate = x
                 => x.RecordType == RecordType.User &&
-                   x.Email == email &&
+                   x.Email == email.ToLowerInvariant() &&
                    !x.IsDeleted;
             ;
             var userRecords = await _cosmosDbConnector.ReadItemsAsync<UserRecord>(RecordType.User, predicate);

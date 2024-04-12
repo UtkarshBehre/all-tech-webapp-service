@@ -48,7 +48,8 @@ namespace all_tech_webapp_service.Services.User
         {
             var userCreateRequest = _tokenHandlerProvider.GetUserCreateRequestFromToken();
             var userRecord = _autoMapperProvider.Mapper.Map<UserRecord>(userCreateRequest);
-            
+            userRecord.Email = userCreateRequest.Email.ToLowerInvariant();
+
             userRecord = await _UserRepository.CreateUser(userRecord);
 
             var todoGroup = await _todoGroupService.CreateTodoGroup(new TodoGroupCreateRequest
