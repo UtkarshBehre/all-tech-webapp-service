@@ -40,7 +40,7 @@ namespace all_tech_webapp_service.Controllers.ToDo
         }
 
         [HttpPut]
-        [Route("share/id={id:guid}/email={email}")]
+        [Route("share/id={id:guid}&email={email}")]
         public async Task<IActionResult> ShareTodoGroup([FromRoute] Guid id, [FromRoute] string email)
         {
             // TODO: validate email

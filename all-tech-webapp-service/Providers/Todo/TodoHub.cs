@@ -31,7 +31,6 @@ namespace all_tech_webapp_service.Providers.Todo
                 .SendAsync("ReceiveTodoGroupUpdates", message);
         }
 
-        // Only for Backend
         public async Task SendTodoGroupSharedMessage(string fullName, string groupName, string userIdSharedWith)
         {
             string message = $"{fullName} shared a todo list group {groupName} with you.";

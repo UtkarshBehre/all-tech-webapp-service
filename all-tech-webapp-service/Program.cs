@@ -62,9 +62,9 @@ namespace all_tech_webapp_service
 
             var app = builder.Build();
 
-            // SETUP SWAGGER FOR ALL ENVIRONMENTS
-            app.UseCors("AllTechApp");
+            app.UseCors("AllTechApp"); // cors should always be first after builder.Build()
 
+            // SETUP SWAGGER FOR ALL ENVIRONMENTS
             app.UseMiddleware<ExceptionHandlerMiddleware>();
             app.UseSwagger();
             app.UseSwaggerUI();
