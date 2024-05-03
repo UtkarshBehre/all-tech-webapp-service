@@ -2,14 +2,14 @@
 using all_tech_webapp_service.Models.Todo.Item;
 using all_tech_webapp_service.Models.Todo.UserTodo;
 using all_tech_webapp_service.Models.User;
-using all_tech_webapp_service.Providers;
+using all_tech_webapp_service.Providers.Mapper;
+using all_tech_webapp_service.Providers.Token;
 using all_tech_webapp_service.Repositories.User;
 using all_tech_webapp_service.Services.Todo.Group;
 using all_tech_webapp_service.Services.Todo.Item;
 using all_tech_webapp_service.Services.Todo.UserTodo;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
-using UserResponse = all_tech_webapp_service.Models.User.UserResponse;
 
 namespace all_tech_webapp_service.Services.User
 {
@@ -49,6 +49,7 @@ namespace all_tech_webapp_service.Services.User
             var userCreateRequest = _tokenHandlerProvider.GetUserCreateRequestFromToken();
             var userRecord = _autoMapperProvider.Mapper.Map<UserRecord>(userCreateRequest);
             userRecord.Email = userCreateRequest.Email.ToLowerInvariant();
+            userRecord.CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
             userRecord = await _UserRepository.CreateUser(userRecord);
 
@@ -100,7 +101,7 @@ namespace all_tech_webapp_service.Services.User
                 
             try
             {
-                var userRecord = await _UserRepository.GetUserByGoogleId(googleId);
+            var userRecord = await _UserRepository.GetUserByGoogleId(googleId);
                 userResponse = _autoMapperProvider.Mapper.Map<UserResponse>(userRecord);
             }
             catch (FileNotFoundException)
@@ -120,6 +121,7 @@ namespace all_tech_webapp_service.Services.User
         {
             var userRecord = await _UserRepository.GetUser(id);
             userRecord = _autoMapperProvider.Mapper.Map(userUpdateRequest, userRecord);
+            userRecord.LastModifiedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
             userRecord = await _UserRepository.UpdateUser(userRecord);
             var userResponse = _autoMapperProvider.Mapper.Map<UserResponse>(userRecord);

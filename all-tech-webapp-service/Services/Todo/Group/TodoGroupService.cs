@@ -1,5 +1,7 @@
 ﻿using all_tech_webapp_service.Models.Todo.Group;
-using all_tech_webapp_service.Providers;
+using all_tech_webapp_service.Models.Todo.UserTodo;
+using all_tech_webapp_service.Providers.Mapper;
+using all_tech_webapp_service.Providers.Token;
 using all_tech_webapp_service.Repositories.Todo.TodoGroupRepository;
 using all_tech_webapp_service.Repositories.Todo.UserTodo;
 using all_tech_webapp_service.Repositories.User;
@@ -11,6 +13,7 @@ namespace all_tech_webapp_service.Services.Todo.Group
         private readonly ITodoGroupRepository _todoGroupRepository;
         private readonly IUserRepository _userRepository;
         private readonly IUserTodoRepository _userTodoRepository;
+        private readonly ITokenHandlerProvider _tokenHandlerProvider;
         private readonly IAutoMapperProvider _autoMapperProvider;
 
         /// <summary>
@@ -19,17 +22,23 @@ namespace all_tech_webapp_service.Services.Todo.Group
         /// <param name="todoGroupRepository"></param>
         /// <param name="autoMapperProvider"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public TodoGroupService(ITodoGroupRepository todoGroupRepository, IUserRepository userService, IUserTodoRepository userTodoRepository, IAutoMapperProvider autoMapperProvider)
+        public TodoGroupService(ITodoGroupRepository todoGroupRepository, IUserRepository userRepository, IUserTodoRepository userTodoRepository, ITokenHandlerProvider tokenHandlerProvider, IAutoMapperProvider autoMapperProvider)
         {
             _todoGroupRepository = todoGroupRepository ?? throw new ArgumentNullException(nameof(todoGroupRepository));
-            _userRepository = userService ?? throw new ArgumentNullException(nameof(userService));
+            _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _userTodoRepository = userTodoRepository ?? throw new ArgumentNullException(nameof(userTodoRepository));
+            _tokenHandlerProvider = tokenHandlerProvider ?? throw new ArgumentNullException(nameof(tokenHandlerProvider));
             _autoMapperProvider = autoMapperProvider ?? throw new ArgumentNullException(nameof(autoMapperProvider));
         }
 
         public async Task<TodoGroupResponse> CreateTodoGroup(TodoGroupCreateRequest todoGroupCreateRequest)
         {
             var todoGroupRecord = _autoMapperProvider.Mapper.Map<TodoGroupRecord>(todoGroupCreateRequest);
+            var googleId = _tokenHandlerProvider.GetSubFromToken();
+            var userRecord = await _userRepository.GetUserByGoogleId(googleId);
+            todoGroupRecord.CreatedBy = userRecord.Id;
+            todoGroupRecord.CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
             todoGroupRecord = await _todoGroupRepository.CreateTodoGroup(todoGroupRecord);
             var todoGroupResponse = _autoMapperProvider.Mapper.Map<TodoGroupResponse>(todoGroupRecord);
             return todoGroupResponse;
@@ -53,6 +62,11 @@ namespace all_tech_webapp_service.Services.Todo.Group
         {
             var todoGroupRecord = await _todoGroupRepository.GetTodoGroup(id);
             todoGroupRecord = _autoMapperProvider.Mapper.Map(todoGroupUpdateRequest, todoGroupRecord);
+
+            var googleId = _tokenHandlerProvider.GetSubFromToken();
+            var userRecord = await _userRepository.GetUserByGoogleId(googleId);
+            todoGroupRecord.LastModifiedBy = userRecord.Id;
+            todoGroupRecord.LastModifiedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
             todoGroupRecord = await _todoGroupRepository.UpdateTodoGroup(todoGroupRecord);
             var todoGroupResponse = _autoMapperProvider.Mapper.Map<TodoGroupResponse>(todoGroupRecord);

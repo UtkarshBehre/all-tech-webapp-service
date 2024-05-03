@@ -1,7 +1,7 @@
 ﻿
 using all_tech_webapp_service.Properties;
-using all_tech_webapp_service.Providers;
 using all_tech_webapp_service.Providers.Todo;
+using all_tech_webapp_service.Providers.Token;
 using Microsoft.ApplicationInsights;
 
 namespace all_tech_webapp_service.Middlewares

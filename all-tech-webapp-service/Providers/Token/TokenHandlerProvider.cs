@@ -3,10 +3,11 @@ using all_tech_webapp_service.Models.User;
 using all_tech_webapp_service.Properties;
 using Microsoft.IdentityModel.Tokens;
 
-namespace all_tech_webapp_service.Providers
+namespace all_tech_webapp_service.Providers.Token
 {
     public class TokenHandlerProvider : ITokenHandlerProvider
     {
+
         private readonly IWebHostEnvironment _env;
         private readonly JwtSecurityTokenHandler _handler;
         private readonly string _aud;
@@ -24,29 +25,19 @@ namespace all_tech_webapp_service.Providers
 
         public void SetToken(string token)
         {
-/*            if (_env.IsDevelopment())
-            {
-                return;
-            }*/
-            
             _jwtToken = _handler.ReadJwtToken(token.Substring("Bearer ".Length));
         }
 
         public string GetSubFromToken()
         {
-           /* if (_env.IsDevelopment())
-            {
-                return "";
-            }*/
+#pragma warning disable CS8603 // Possible null reference return.
             return _jwtToken.Claims.FirstOrDefault(claim => claim.Type == "sub")?.Value;
+#pragma warning restore CS8603 // Possible null reference return.
         }
 
         public UserCreateRequest GetUserCreateRequestFromToken()
         {
-            /*   if (_env.IsDevelopment())
-            {
-                return "";
-            }*/
+#pragma warning disable CS8601 // Possible null reference assignment.
             var userCreateRequest = new UserCreateRequest
             {
                 Email = _jwtToken.Claims.FirstOrDefault(x => x.Type == "email")?.Value,
@@ -54,21 +45,22 @@ namespace all_tech_webapp_service.Providers
                 LastName = _jwtToken.Claims.FirstOrDefault(x => x.Type == "family_name")?.Value,
                 GoogleId = _jwtToken.Claims.FirstOrDefault(claim => claim.Type == "sub")?.Value
             };
+#pragma warning restore CS8601 // Possible null reference assignment.
 
             return userCreateRequest;
         }
 
         public void ValidateToken()
         {
-/*            if (_env.IsDevelopment())
-            {
-                return true;
-            }*/
-
             var exp = _jwtToken.Claims.FirstOrDefault(x => x.Type == "exp")?.Value;
+
+            #pragma warning disable CS8604 // Possible null reference argument.
             var expDate = DateTimeOffset.FromUnixTimeSeconds(long.Parse(exp));
-            if (expDate < DateTimeOffset.Now) {
-                throw new SecurityTokenExpiredException(); 
+            #pragma warning restore CS8604 // Possible null reference argument.
+
+            if (expDate < DateTimeOffset.Now)
+            {
+                throw new SecurityTokenExpiredException();
             }
 
             var iss = _jwtToken.Claims.FirstOrDefault(x => x.Type == "iss")?.Value;

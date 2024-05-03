@@ -1,6 +1,6 @@
 ﻿using all_tech_webapp_service.Models.User;
 
-namespace all_tech_webapp_service.Providers
+namespace all_tech_webapp_service.Providers.Token
 {
     public interface ITokenHandlerProvider
     {

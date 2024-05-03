@@ -1,6 +1,8 @@
 ﻿using all_tech_webapp_service.Connectors;
 using all_tech_webapp_service.Models.Todo;
 using all_tech_webapp_service.Models.Todo.Item;
+using all_tech_webapp_service.Properties;
+using all_tech_webapp_service.Providers.Cache;
 using AutoMapper;
 using System.Linq.Expressions;
 
@@ -9,10 +11,12 @@ namespace all_tech_webapp_service.Repositories.Todo.TodoItem
     public class TodoItemRepository : ITodoItemRepository
     {
         private readonly ICosmosDbConnector _cosmosDbConnector;
+        private readonly ICacheProvider _cacheProvider;
 
-        public TodoItemRepository(ICosmosDbConnector cosmosDbConnector)
+        public TodoItemRepository(ICosmosDbConnector cosmosDbConnector, ICacheProvider cacheProvider)
         {
             _cosmosDbConnector = cosmosDbConnector ?? throw new ArgumentNullException(nameof(cosmosDbConnector));
+            _cacheProvider = cacheProvider ?? throw new ArgumentNullException(nameof(cacheProvider));
         }
 
         /// <summary>
@@ -22,23 +26,35 @@ namespace all_tech_webapp_service.Repositories.Todo.TodoItem
         /// <returns></returns>
         public async Task<TodoItemRecord> CreateTodoItem(TodoItemRecord todoItemRecord)
         {
-            return await _cosmosDbConnector.CreateItemAsync(todoItemRecord, todoItemRecord.RecordType);
+            var createdTodoItemRecord = await _cosmosDbConnector.CreateItemAsync(todoItemRecord, todoItemRecord.RecordType);
+
+            await _cacheProvider.Delete(CacheKeysConstants.KEY_TODO_ITEM_ALL);
+
+            return createdTodoItemRecord;
         }
 
         public async Task<List<TodoItemRecord>> GetAllTodoItems()
         {
+            var key = CacheKeysConstants.KEY_TODO_ITEM_ALL;
+            var todoItems = await _cacheProvider.Get<List<TodoItemRecord>>(key);
+
+            if (todoItems != null && todoItems.Count != 0)
+            {
+                return todoItems;
+            }
+
             Expression<Func<TodoItemRecord, bool>> predicate = x 
                 => x.RecordType == RecordType.TodoItem &&
                    !x.IsDeleted;
                                                                                             ;
             var allTodoItems = await _cosmosDbConnector.ReadItemsAsync<TodoItemRecord>(RecordType.TodoItem, predicate);
+            await _cacheProvider.Set(key, allTodoItems);
             return allTodoItems;
         }
 
         public async Task<List<TodoItemRecord>> GetAllTodoItems(Expression<Func<TodoItemRecord, bool>> predicate)
         {
-            var allTodoItems = await _cosmosDbConnector.ReadItemsAsync<TodoItemRecord>(RecordType.TodoItem, predicate);
-            return allTodoItems;
+            return await _cosmosDbConnector.ReadItemsAsync<TodoItemRecord>(RecordType.TodoItem, predicate);
         }
 
         public async Task<List<TodoItemRecord>> GetAllTodoItemsByGroupIds(List<Guid> groupIds)
@@ -82,11 +98,21 @@ namespace all_tech_webapp_service.Repositories.Todo.TodoItem
         /// <returns></returns>
         public async Task<TodoItemRecord> GetTodoItem(Guid id)
         {
-            var todoItemRecord = await _cosmosDbConnector.ReadItemAsync<TodoItemRecord>(id.ToString(), id.ToString(), RecordType.TodoItem);
+            var key = string.Format(CacheKeysConstants.KEY_TODO_ITEM_ID, id);
+            var todoItemRecord = await _cacheProvider.Get<TodoItemRecord>(key);
+            if (todoItemRecord != null)
+            {
+                return todoItemRecord;
+            }
+
+            todoItemRecord = await _cosmosDbConnector.ReadItemAsync<TodoItemRecord>(id.ToString(), id.ToString(), RecordType.TodoItem);
             if (todoItemRecord == null || todoItemRecord.IsDeleted)
             {
                 throw new FileNotFoundException($"No Todo Item Record Found with the given Id: {id}");
             }
+
+            await _cacheProvider.Set(key, todoItemRecord);
+
             return todoItemRecord;
         }
 
@@ -102,7 +128,11 @@ namespace all_tech_webapp_service.Repositories.Todo.TodoItem
             {
                 throw new FileNotFoundException($"No Todo Item Record Found with the given Id: {todoItemRecord.Id}");
             }
-            return await _cosmosDbConnector.UpdateItemAsync(todoItemRecord, todoItemRecord.Id.ToString(), todoItemRecord.RecordType, todoItemRecord.Etag);
+            var updatedTodoItemRecord = await _cosmosDbConnector.UpdateItemAsync(todoItemRecord, todoItemRecord.Id.ToString(), todoItemRecord.RecordType, todoItemRecord.Etag);
+
+            await _cacheProvider.Delete(string.Format(CacheKeysConstants.KEY_TODO_ITEM_ID, todoItemRecord.Id));
+            await _cacheProvider.Delete(CacheKeysConstants.KEY_TODO_ITEM_ALL);
+            return updatedTodoItemRecord;
         }
 
         /// <summary>

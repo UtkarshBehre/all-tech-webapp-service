@@ -3,7 +3,10 @@ using all_tech_webapp_service.Middlewares;
 using all_tech_webapp_service.Models.Config;
 using all_tech_webapp_service.Properties;
 using all_tech_webapp_service.Providers;
+using all_tech_webapp_service.Providers.Cache;
+using all_tech_webapp_service.Providers.Mapper;
 using all_tech_webapp_service.Providers.Todo;
+using all_tech_webapp_service.Providers.Token;
 using all_tech_webapp_service.Repositories.Todo.TodoGroupRepository;
 using all_tech_webapp_service.Repositories.Todo.TodoItem;
 using all_tech_webapp_service.Repositories.Todo.UserTodo;
@@ -15,7 +18,6 @@ using all_tech_webapp_service.Services.Todo.Item;
 using all_tech_webapp_service.Services.Todo.UserTodo;
 using all_tech_webapp_service.Services.User;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
-using Microsoft.AspNetCore.SignalR;
 using ConfigurationManager = System.Configuration.ConfigurationManager;
 
 namespace all_tech_webapp_service
@@ -54,6 +56,11 @@ namespace all_tech_webapp_service
             var cosmosDbConnector = new CosmosDbConnector(cosmosDbConfig);
 
             builder.Services.AddSingleton<ICosmosDbConnector>(x => cosmosDbConnector);
+
+            // SETUP REDIS CACHE
+            var cacheConnectionString = builder.Configuration.GetValue<string>(Constants.REDIS_CACHE_CONNECTION_STRING) ?? string.Empty;
+            var cacheProvider = new CacheProvider(cacheConnectionString, builder.Environment.IsDevelopment());
+            builder.Services.AddSingleton<ICacheProvider>(x => cacheProvider);
 
             var tokenHandlerProvider = new TokenHandlerProvider(builder.Environment, builder.Configuration);
             builder.Services.AddSingleton<ITokenHandlerProvider>(x => tokenHandlerProvider);

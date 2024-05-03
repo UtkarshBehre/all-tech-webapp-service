@@ -24,7 +24,9 @@ namespace all_tech_webapp_service.Models.Todo.Item
         [JsonProperty("isComplete")]
         public bool IsComplete { get; set; }
 
-        [Required]
+        [JsonProperty("completedBy")]
+        public Guid? CompletedBy { get; set; }
+
         [JsonProperty("_etag")]
         public string Etag { get; set; }
     }

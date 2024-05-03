@@ -35,7 +35,7 @@ namespace all_tech_webapp_service.Providers
 
         public async Task SendMessage(string message)
         {
-            if (connectionIdTochatDetails.TryGetValue(Context.ConnectionId, out ChatDetails chatDetails))
+            if (connectionIdTochatDetails.TryGetValue(Context.ConnectionId, out ChatDetails? chatDetails))
             {
                 _telemetryClient.TrackTrace($"ConnectionId: {Context.ConnectionId} User {chatDetails.UserName} ChatRoom: {chatDetails.ChatRoom}");
                 await Clients.Group(chatDetails.ChatRoom)

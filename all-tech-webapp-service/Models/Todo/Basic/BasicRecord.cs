@@ -12,6 +12,18 @@ namespace all_tech_webapp_service.Models.Todo.Basic
         [JsonProperty("recordType")]
         public RecordType RecordType { get; set; }
 
+        [JsonProperty("createdAt")]
+        public long CreatedAt { get; set; }
+
+        [JsonProperty("createdBy")]
+        public Guid CreatedBy { get; set; }
+
+        [JsonProperty("lastModifiedAt")]
+        public long? LastModifiedAt { get; set; }
+
+        [JsonProperty("lastModifiedBy")]
+        public Guid? LastModifiedBy { get; set; }
+
         [JsonProperty("isDeleted")]
         public bool IsDeleted { get; set; }
 

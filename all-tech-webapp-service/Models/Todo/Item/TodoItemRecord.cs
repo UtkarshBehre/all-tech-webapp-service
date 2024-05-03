@@ -14,6 +14,12 @@ namespace all_tech_webapp_service.Models.Todo.Item
         [JsonProperty("isComplete")]
         public bool IsComplete { get; set; }
 
+        [JsonProperty("completedBy")]
+        public Guid? CompletedBy { get; set; }
+
+        [JsonProperty("completedAt")]
+        public long? CompletedAt { get; set; }
+
         public TodoItemRecord(): base()
         {
             IsComplete = false;

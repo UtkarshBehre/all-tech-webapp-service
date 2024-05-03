@@ -1,14 +1,14 @@
 ﻿using all_tech_webapp_service.Models;
 using AutoMapper;
 
-namespace all_tech_webapp_service.Providers
+namespace all_tech_webapp_service.Providers.Mapper
 {
     public class AutoMapperProvider : IAutoMapperProvider
     {
         public IMapper Mapper { get; private set; }
 
-        public AutoMapperProvider() 
-        { 
+        public AutoMapperProvider()
+        {
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile<MappingProfiles>();

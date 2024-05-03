@@ -1,10 +1,8 @@
 ﻿using all_tech_webapp_service.Services.User;
 using all_tech_webapp_service.Models.User;
-using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Cosmos;
-using all_tech_webapp_service.Providers;
+using all_tech_webapp_service.Providers.Token;
 
 namespace all_tech_webapp_service.Controllers.User
 {
